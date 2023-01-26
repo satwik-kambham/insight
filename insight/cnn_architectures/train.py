@@ -27,7 +27,7 @@ def load_data(root):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
-            transforms.CenterCrop(256),
+            transforms.CenterCrop(32),
             transforms.ToTensor(),
             # transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
         ]
