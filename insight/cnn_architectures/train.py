@@ -29,18 +29,28 @@ def load_data(root):
         [
             transforms.CenterCrop(256),
             transforms.ToTensor(),
-            transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
+            # transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
         ]
     )
     label_transform = transforms.Compose([])
-    dataset = datasets.Caltech256(
+    train_dataset = datasets.CIFAR10(
         root,
+        train=True,
         transform=img_transform,
         target_transform=label_transform,
+        download=True,
     )
 
-    # Splitting the dataset into train and validation
-    train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
+    val_dataset = datasets.CIFAR10(
+        root,
+        train=False,
+        transform=img_transform,
+        target_transform=label_transform,
+        download=True,
+    )
+
+    # # Splitting the dataset into train and validation
+    # train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
 
     # Creating the dataloaders
     train_loader = torch.utils.data.DataLoader(
@@ -142,8 +152,8 @@ def main():
     device = torch.device(args.device)
 
     # Creating the model
-    model = LeNet5(num_classes=257)
-    test_input_size = (1, 3, 256, 256)
+    model = LeNet5(num_classes=10)
+    test_input_size = (1, 3, 32, 32)
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 
