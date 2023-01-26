@@ -149,7 +149,7 @@ def main():
 
     # Printing the model summary
     model.eval()
-    print(summary(model, input_size=test_input_size))
+    summary(model, input_size=test_input_size)
 
     # Defining the loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
