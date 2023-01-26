@@ -73,7 +73,7 @@ def train_loop(model, loss_fn, optimizer, train_loader, device):
         loss.backward()
         optimizer.step()
         train_loss += loss.item()
-    train_loss /= len(train_loader.dataset)
+    train_loss /= batch_idx * data.shape[0]
     return train_loss
 
 
@@ -82,15 +82,15 @@ def val_loop(model, loss_fn, val_loader, device):
     val_loss = 0
     correct = 0
     with torch.no_grad():
-        for data, target in val_loader:
+        for batch_idx, (data, target) in enumerate(val_loader):
             data = data.to(device)
             target = target.to(device)
             output = model(data)
             val_loss += loss_fn(output, target).item()
             pred = output.argmax(dim=1, keepdim=True)
             correct += pred.eq(target.view_as(pred)).sum().item()
-    val_loss /= len(val_loader.dataset)
-    val_accuracy = correct / len(val_loader.dataset)
+    val_loss /= batch_idx * data.shape[0]
+    val_accuracy = correct / (batch_idx * data.shape[0])
     return val_loss, val_accuracy
 
 
@@ -99,11 +99,16 @@ def train(model, loss_fn, optimizer, train_loader, val_loader, epochs, device):
     for epoch in range(1, epochs + 1):
         train_loss = train_loop(model, loss_fn, optimizer, train_loader, device)
         val_loss, val_accuracy = val_loop(model, loss_fn, val_loader, device)
-        wandb.log({
-            "train_loss": train_loss,
-            "val_loss": val_loss,
-            "val_accuracy": val_accuracy,
-        })
+        wandb.log(
+            {
+                "train_loss": train_loss,
+                "val_loss": val_loss,
+                "val_accuracy": val_accuracy,
+            }
+        )
+        print(
+            f"Epoch: {epoch}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}"
+        )
     return train_loss, val_loss, val_accuracy
 
 
