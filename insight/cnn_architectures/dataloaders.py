@@ -62,7 +62,7 @@ def load_Caltech256(root):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
-            transforms.Resize(256),
+            transforms.Resize((256, 256)),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
         ]
