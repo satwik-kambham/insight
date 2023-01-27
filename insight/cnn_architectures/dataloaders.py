@@ -68,9 +68,8 @@ def load_Caltech256(root):
         ]
     )
     label_transform = transforms.Compose([])
-    dataset = datasets.CIFAR10(
+    dataset = datasets.Caltech256(
         root,
-        train=True,
         transform=img_transform,
         target_transform=label_transform,
         download=True,
