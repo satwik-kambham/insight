@@ -2,14 +2,44 @@ import torch
 from torchvision import datasets, transforms
 
 
-def load_data(root, hyperparameters, dataset="CIFAR10"):
+def load_data(root, hyperparameters, img_shape, dataset="CIFAR10"):
+    """Load the specified dataset and create the corresponding dataloaders
+
+    Parameters
+    ----------
+    root : str
+        Path where the dataset will be stored
+    hyperparameters : dict
+        dict of hyperparameters
+    img_shape : tuple
+        shape to which the images will be resized
+    dataset : str, optional
+        dataset to load, by default "CIFAR10"
+        Available datasets:
+            - CIFAR10
+            - Caltech256
+            - Caltech101
+            - fashion_MNIST
+
+    Returns
+    -------
+    tuple(DataLoader, DataLoader)
+        train and validation dataloaders
+
+    Raises
+    ------
+    ValueError
+        If the specified dataset is not implemented
+    """
     # Loading the dataset
     if dataset == "CIFAR10":
-        train_dataset, val_dataset = load_CIFAR10(root)
+        train_dataset, val_dataset = load_CIFAR10(root, img_shape)
     elif dataset == "Caltech256":
-        train_dataset, val_dataset = load_Caltech256(root)
+        train_dataset, val_dataset = load_Caltech256(root, img_shape)
     elif dataset == "Caltech101":
-        train_dataset, val_dataset = load_Caltech101(root)
+        train_dataset, val_dataset = load_Caltech101(root, img_shape)
+    elif dataset == "fashion_MNIST":
+        train_dataset, val_dataset = load_fashion_MNIST(root, img_shape)
     else:
         raise ValueError(f"Dataset {dataset} not implemented")
 
@@ -32,11 +62,11 @@ def load_data(root, hyperparameters, dataset="CIFAR10"):
     return train_loader, val_loader
 
 
-def load_CIFAR10(root):
+def load_CIFAR10(root, img_shape=(244, 244)):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
-            transforms.Resize((244, 244)),
+            transforms.Resize(img_shape),
             transforms.ToTensor(),
         ]
     )
@@ -60,11 +90,11 @@ def load_CIFAR10(root):
     return train_dataset, val_dataset
 
 
-def load_Caltech256(root):
+def load_Caltech256(root, img_shape=(256, 256)):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
-            transforms.Resize((256, 256)),
+            transforms.Resize(img_shape),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
         ]
@@ -82,11 +112,12 @@ def load_Caltech256(root):
 
     return train_dataset, val_dataset
 
-def load_Caltech101(root):
+
+def load_Caltech101(root, img_shape=(300, 200)):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
-            transforms.CenterCrop((300, 200)),
+            transforms.Resize(img_shape),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
         ]
@@ -101,5 +132,33 @@ def load_Caltech101(root):
 
     # Splitting the dataset into train and validation
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
+
+    return train_dataset, val_dataset
+
+
+def load_fashion_MNIST(root, img_shape=(244, 244)):
+    # Loading the dataset
+    img_transform = transforms.Compose(
+        [
+            transforms.Resize(img_shape),
+            transforms.ToTensor(),
+        ]
+    )
+    label_transform = transforms.Compose([])
+    train_dataset = datasets.FashionMNIST(
+        root,
+        train=True,
+        transform=img_transform,
+        target_transform=label_transform,
+        download=True,
+    )
+
+    val_dataset = datasets.FashionMNIST(
+        root,
+        train=False,
+        transform=img_transform,
+        target_transform=label_transform,
+        download=True,
+    )
 
     return train_dataset, val_dataset
