@@ -11,6 +11,7 @@ import wandb
 
 from dataloaders import load_data
 from LeNet import LeNet5
+from AlexNet import AlexNet
 
 # Hyperparameters for training
 hyperparameters = {
@@ -107,7 +108,7 @@ def main():
     device = torch.device(args.device)
 
     # Creating the model
-    model = LeNet5(num_classes=257)
+    model = AlexNet(num_classes=257)
     test_input_size = (1, 3, 256, 256)
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
