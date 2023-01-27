@@ -106,8 +106,8 @@ def main():
     )
 
     # Image x and y dimensions
-    parser.add_argument("--img_x", type=int, default=244, help="image x dimension")
-    parser.add_argument("--img_y", type=int, default=244, help="image y dimension")
+    parser.add_argument("--img_x", type=int, default=-1, help="image x dimension")
+    parser.add_argument("--img_y", type=int, default=-1, help="image y dimension")
 
     parser.add_argument(
         "--device", type=str, default="cpu", help="device to use for training / testing"
@@ -121,7 +121,9 @@ def main():
     hyperparameters["lr"] = args.learning_rate
     hyperparameters["architecture"] = args.architecture
     hyperparameters["dataset"] = args.dataset
-    hyperparameters["img_shape"] = (args.img_x, args.img_y)
+
+    if args.img_x != -1 or args.img_y != -1:
+        hyperparameters["img_shape"] = (args.img_x, args.img_y)
 
     # Loading the dataset
     train_loader, val_loader, num_classes, img_shape = load_data(

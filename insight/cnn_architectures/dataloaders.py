@@ -74,7 +74,10 @@ def load_data(root, hyperparameters):
     return train_loader, val_loader, num_classes, img_shape
 
 
-def load_CIFAR10(root, img_shape=(244, 244)):
+def load_CIFAR10(root, img_shape):
+    if img_shape is None:
+        img_shape = (244, 244)
+
     # Loading the dataset
     img_transform = transforms.Compose(
         [
@@ -102,7 +105,10 @@ def load_CIFAR10(root, img_shape=(244, 244)):
     return train_dataset, val_dataset, img_shape
 
 
-def load_Caltech256(root, img_shape=(256, 256)):
+def load_Caltech256(root, img_shape):
+    if img_shape is None:
+        img_shape = (256, 256)
+
     # Loading the dataset
     img_transform = transforms.Compose(
         [
@@ -125,7 +131,10 @@ def load_Caltech256(root, img_shape=(256, 256)):
     return train_dataset, val_dataset, img_shape
 
 
-def load_Caltech101(root, img_shape=(300, 200)):
+def load_Caltech101(root, img_shape):
+    if img_shape is None:
+        img_shape = (300, 200)
+
     # Loading the dataset
     img_transform = transforms.Compose(
         [
@@ -148,7 +157,10 @@ def load_Caltech101(root, img_shape=(300, 200)):
     return train_dataset, val_dataset, img_shape
 
 
-def load_fashion_MNIST(root, img_shape=(244, 244)):
+def load_fashion_MNIST(root, img_shape):
+    if img_shape is None:
+        img_shape = (244, 244)
+
     # Loading the dataset
     img_transform = transforms.Compose(
         [
