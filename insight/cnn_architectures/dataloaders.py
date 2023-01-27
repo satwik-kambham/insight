@@ -36,7 +36,7 @@ def load_CIFAR10(root):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
-            transforms.CenterCrop(32),
+            transforms.Resize((244, 244)),
             transforms.ToTensor(),
         ]
     )

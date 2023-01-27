@@ -103,13 +103,13 @@ def main():
     wandb.init(project="cnn-architectures", config=hyperparameters)
 
     # Loading the dataset
-    train_loader, val_loader = load_data(args.data, hyperparameters, "Caltech256")
+    train_loader, val_loader = load_data(args.data, hyperparameters, "CIFAR10")
 
     device = torch.device(args.device)
 
     # Creating the model
-    model = AlexNet(num_classes=101)
-    test_input_size = (1, 3, 300, 200)
+    model = AlexNet(num_classes=10)
+    test_input_size = (1, 3, 244, 244)
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 
