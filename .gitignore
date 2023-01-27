@@ -1,0 +1,11 @@
+# Testing notebooks
+*-test.ipynb
+
+# Ignore datasets
+insight/datasets/data
+
+# Ignore python cache
+__pycache__
+
+# wand
+wandb
