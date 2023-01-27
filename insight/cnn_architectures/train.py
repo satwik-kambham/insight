@@ -21,6 +21,9 @@ hyperparameters = {
     "val_workers": 0,
     "epochs": 10,
     "lr": 0.01,
+    "img_shape": None,
+    "architecture": "LeNet5",
+    "dataset": "CIFAR10",
 }
 
 
@@ -88,6 +91,23 @@ def main():
     parser.add_argument(
         "-lr", "--learning_rate", type=float, default=0.01, help="learning rate"
     )
+    parser.add_argument(
+        "--dataset",
+        type=str,
+        default="CIFAR10",
+        help="dataset to use - CIFAR10, Caltech256, Caltech101, fashion_MNIST, ...",
+    )
+    parser.add_argument(
+        "-a",
+        "--architecture",
+        type=str,
+        default="LeNet5",
+        help="CNN architecture to use - LeNet5, AlexNet, ...",
+    )
+
+    # Image x and y dimensions
+    parser.add_argument("--img_x", type=int, default=244, help="image x dimension")
+    parser.add_argument("--img_y", type=int, default=244, help="image y dimension")
 
     parser.add_argument(
         "--device", type=str, default="cpu", help="device to use for training / testing"
@@ -99,17 +119,30 @@ def main():
     hyperparameters["train_batch_size"] = args.batch_size
     hyperparameters["val_batch_size"] = args.batch_size
     hyperparameters["lr"] = args.learning_rate
-
-    wandb.init(project="cnn-architectures", config=hyperparameters)
+    hyperparameters["architecture"] = args.architecture
+    hyperparameters["dataset"] = args.dataset
+    hyperparameters["img_shape"] = (args.img_x, args.img_y)
 
     # Loading the dataset
-    train_loader, val_loader = load_data(args.data, hyperparameters, "CIFAR10")
+    train_loader, val_loader, num_classes, img_shape = load_data(
+        args.data,
+        hyperparameters,
+    )
+
+    hyperparameters["img_shape"] = img_shape
+
+    wandb.init(project="cnn-architectures", config=hyperparameters)
 
     device = torch.device(args.device)
 
     # Creating the model
-    model = AlexNet(num_classes=10)
-    test_input_size = (1, 3, 244, 244)
+    if hyperparameters["architecture"] == "LeNet5":
+        model = LeNet5(num_classes=num_classes)
+    elif hyperparameters["architecture"] == "AlexNet":
+        model = AlexNet(num_classes=num_classes)
+    else:
+        raise NotImplementedError
+    test_input_size = (1, 3, *hyperparameters["img_shape"])
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 

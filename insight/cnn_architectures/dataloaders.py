@@ -2,8 +2,13 @@ import torch
 from torchvision import datasets, transforms
 
 
-def load_data(root, hyperparameters, img_shape, dataset="CIFAR10"):
+def load_data(root, hyperparameters):
     """Load the specified dataset and create the corresponding dataloaders
+    Available datasets:
+        - CIFAR10
+        - Caltech256
+        - Caltech101
+        - fashion_MNIST
 
     Parameters
     ----------
@@ -11,35 +16,42 @@ def load_data(root, hyperparameters, img_shape, dataset="CIFAR10"):
         Path where the dataset will be stored
     hyperparameters : dict
         dict of hyperparameters
-    img_shape : tuple
-        shape to which the images will be resized
-    dataset : str, optional
-        dataset to load, by default "CIFAR10"
-        Available datasets:
-            - CIFAR10
-            - Caltech256
-            - Caltech101
-            - fashion_MNIST
 
     Returns
     -------
-    tuple(DataLoader, DataLoader)
-        train and validation dataloaders
+    tuple(DataLoader, DataLoader, int, tuple(int, int)))
+        train and validation dataloaders, number of classes and image shape
 
     Raises
     ------
     ValueError
         If the specified dataset is not implemented
     """
+    num_classes = 10
+    dataset = hyperparameters["dataset"]
+    img_shape = hyperparameters["img_shape"]
+
     # Loading the dataset
     if dataset == "CIFAR10":
-        train_dataset, val_dataset = load_CIFAR10(root, img_shape)
+        train_dataset, val_dataset, img_shape = load_CIFAR10(
+            root, hyperparameters["img_shape"]
+        )
+        num_classes = 10
     elif dataset == "Caltech256":
-        train_dataset, val_dataset = load_Caltech256(root, img_shape)
+        train_dataset, val_dataset, img_shape = load_Caltech256(
+            root, hyperparameters["img_shape"]
+        )
+        num_classes = 257
     elif dataset == "Caltech101":
-        train_dataset, val_dataset = load_Caltech101(root, img_shape)
+        train_dataset, val_dataset, img_shape = load_Caltech101(
+            root, hyperparameters["img_shape"]
+        )
+        num_classes = 101
     elif dataset == "fashion_MNIST":
-        train_dataset, val_dataset = load_fashion_MNIST(root, img_shape)
+        train_dataset, val_dataset, img_shape = load_fashion_MNIST(
+            root, hyperparameters["img_shape"]
+        )
+        num_classes = 10
     else:
         raise ValueError(f"Dataset {dataset} not implemented")
 
@@ -59,7 +71,7 @@ def load_data(root, hyperparameters, img_shape, dataset="CIFAR10"):
         num_workers=hyperparameters["val_workers"],
     )
 
-    return train_loader, val_loader
+    return train_loader, val_loader, num_classes, img_shape
 
 
 def load_CIFAR10(root, img_shape=(244, 244)):
@@ -87,7 +99,7 @@ def load_CIFAR10(root, img_shape=(244, 244)):
         download=True,
     )
 
-    return train_dataset, val_dataset
+    return train_dataset, val_dataset, img_shape
 
 
 def load_Caltech256(root, img_shape=(256, 256)):
@@ -110,7 +122,7 @@ def load_Caltech256(root, img_shape=(256, 256)):
     # Splitting the dataset into train and validation
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
 
-    return train_dataset, val_dataset
+    return train_dataset, val_dataset, img_shape
 
 
 def load_Caltech101(root, img_shape=(300, 200)):
@@ -133,7 +145,7 @@ def load_Caltech101(root, img_shape=(300, 200)):
     # Splitting the dataset into train and validation
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
 
-    return train_dataset, val_dataset
+    return train_dataset, val_dataset, img_shape
 
 
 def load_fashion_MNIST(root, img_shape=(244, 244)):
@@ -161,4 +173,4 @@ def load_fashion_MNIST(root, img_shape=(244, 244)):
         download=True,
     )
 
-    return train_dataset, val_dataset
+    return train_dataset, val_dataset, img_shape
