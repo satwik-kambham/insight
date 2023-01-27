@@ -5,11 +5,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 
 from torchinfo import summary
 import wandb
 
+from dataloaders import load_data
 from LeNet import LeNet5
 
 # Hyperparameters for training
@@ -21,54 +21,6 @@ hyperparameters = {
     "epochs": 10,
     "lr": 0.01,
 }
-
-
-def load_data(root):
-    # Loading the dataset
-    img_transform = transforms.Compose(
-        [
-            transforms.CenterCrop(32),
-            transforms.ToTensor(),
-            # transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
-        ]
-    )
-    label_transform = transforms.Compose([])
-    train_dataset = datasets.CIFAR10(
-        root,
-        train=True,
-        transform=img_transform,
-        target_transform=label_transform,
-        download=True,
-    )
-
-    val_dataset = datasets.CIFAR10(
-        root,
-        train=False,
-        transform=img_transform,
-        target_transform=label_transform,
-        download=True,
-    )
-
-    # # Splitting the dataset into train and validation
-    # train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
-
-    # Creating the dataloaders
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=hyperparameters["train_batch_size"],
-        shuffle=True,
-        drop_last=True,
-        num_workers=hyperparameters["train_workers"],
-    )
-    val_loader = torch.utils.data.DataLoader(
-        val_dataset,
-        batch_size=hyperparameters["val_batch_size"],
-        shuffle=False,
-        drop_last=True,
-        num_workers=hyperparameters["val_workers"],
-    )
-
-    return train_loader, val_loader
 
 
 def train_loop(model, loss_fn, optimizer, train_loader, device):
@@ -149,11 +101,14 @@ def main():
 
     wandb.init(project="cnn-architectures", config=hyperparameters)
 
+    # Loading the dataset
+    train_loader, val_loader = load_data(args.data, hyperparameters, "Caltech256")
+
     device = torch.device(args.device)
 
     # Creating the model
-    model = LeNet5(num_classes=10)
-    test_input_size = (1, 3, 32, 32)
+    model = LeNet5(num_classes=257)
+    test_input_size = (1, 3, 256, 256)
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 
@@ -164,9 +119,6 @@ def main():
     # Defining the loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=hyperparameters["lr"])
-
-    # Loading the dataset
-    train_loader, val_loader = load_data(args.data)
 
     wandb.watch(model)
 
