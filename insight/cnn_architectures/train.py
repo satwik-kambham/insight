@@ -108,8 +108,8 @@ def main():
     device = torch.device(args.device)
 
     # Creating the model
-    model = AlexNet(num_classes=257)
-    test_input_size = (1, 3, 256, 256)
+    model = AlexNet(num_classes=101)
+    test_input_size = (1, 3, 300, 200)
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 

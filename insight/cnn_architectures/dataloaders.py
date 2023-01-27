@@ -8,6 +8,8 @@ def load_data(root, hyperparameters, dataset="CIFAR10"):
         train_dataset, val_dataset = load_CIFAR10(root)
     elif dataset == "Caltech256":
         train_dataset, val_dataset = load_Caltech256(root)
+    elif dataset == "Caltech101":
+        train_dataset, val_dataset = load_Caltech101(root)
     else:
         raise ValueError(f"Dataset {dataset} not implemented")
 
@@ -90,7 +92,7 @@ def load_Caltech101(root):
         ]
     )
     label_transform = transforms.Compose([])
-    dataset = datasets.Caltech256(
+    dataset = datasets.Caltech101(
         root,
         transform=img_transform,
         target_transform=label_transform,
