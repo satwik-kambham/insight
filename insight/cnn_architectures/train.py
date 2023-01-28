@@ -12,6 +12,7 @@ import wandb
 from dataloaders import load_data
 from LeNet import LeNet5
 from AlexNet import AlexNet
+from VGG import *
 
 # Hyperparameters for training
 hyperparameters = {
@@ -142,6 +143,16 @@ def main():
         model = LeNet5(num_classes=num_classes)
     elif hyperparameters["architecture"] == "AlexNet":
         model = AlexNet(num_classes=num_classes)
+    elif hyperparameters["architecture"] == "VGG11":
+        model = VGG(VGG_A, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "VGG13":
+        model = VGG(VGG_B, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "VGG16-1":
+        model = VGG(VGG_C, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "VGG16":
+        model = VGG(VGG_D, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "VGG19":
+        model = VGG(VGG_E, num_classes=num_classes)
     else:
         raise NotImplementedError
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
