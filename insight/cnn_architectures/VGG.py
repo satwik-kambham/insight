@@ -49,17 +49,14 @@ class VGG(nn.Module):
     def __init__(self, config=VGG_A, num_classes=256):
         super().__init__()
         blocks = {}
-        in_channels = 3
         for i, block_config in enumerate(config):
             block = {}
             for j, (out_channels, kernel_size) in enumerate(block_config):
-                block[f"conv{j+1}"] = nn.Conv2d(
-                    in_channels,
+                block[f"conv{j+1}"] = nn.LazyConv2d(
                     out_channels,
                     kernel_size,
                     padding=kernel_size // 2,
                 )
-                in_channels = out_channels
                 block[f"relu{j+1}"] = nn.ReLU()
             block["pool"] = nn.MaxPool2d(2, 2)
             blocks[f"block{i+1}"] = nn.Sequential(OrderedDict(block))
