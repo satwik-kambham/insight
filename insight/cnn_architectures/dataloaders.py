@@ -19,8 +19,9 @@ def load_data(root, hyperparameters):
 
     Returns
     -------
-    tuple(DataLoader, DataLoader, int, tuple(int, int)))
-        train and validation dataloaders, number of classes and image shape
+    tuple(DataLoader, DataLoader, int, tuple(int, int), int)
+        train and validation dataloaders, number of classes, image shape and
+        number of channels
 
     Raises
     ------
@@ -28,6 +29,7 @@ def load_data(root, hyperparameters):
         If the specified dataset is not implemented
     """
     num_classes = 10
+    num_channels = 3
     dataset = hyperparameters["dataset"]
     img_shape = hyperparameters["img_shape"]
 
@@ -52,6 +54,7 @@ def load_data(root, hyperparameters):
             root, hyperparameters["img_shape"]
         )
         num_classes = 10
+        num_channels = 1
     else:
         raise ValueError(f"Dataset {dataset} not implemented")
 
@@ -71,7 +74,7 @@ def load_data(root, hyperparameters):
         num_workers=hyperparameters["val_workers"],
     )
 
-    return train_loader, val_loader, num_classes, img_shape
+    return train_loader, val_loader, num_classes, img_shape, num_channels
 
 
 def load_CIFAR10(root, img_shape):

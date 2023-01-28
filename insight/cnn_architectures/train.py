@@ -126,7 +126,7 @@ def main():
         hyperparameters["img_shape"] = (args.img_x, args.img_y)
 
     # Loading the dataset
-    train_loader, val_loader, num_classes, img_shape = load_data(
+    train_loader, val_loader, num_classes, img_shape, num_channels = load_data(
         args.data,
         hyperparameters,
     )
@@ -144,7 +144,7 @@ def main():
         model = AlexNet(num_classes=num_classes)
     else:
         raise NotImplementedError
-    test_input_size = (1, 3, *hyperparameters["img_shape"])
+    test_input_size = (1, num_channels, *hyperparameters["img_shape"])
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 
