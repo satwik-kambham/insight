@@ -155,10 +155,11 @@ def main():
         model = VGG(VGG_E, num_classes=num_classes)
     else:
         raise NotImplementedError
-    model = torch.compile(model)
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
+
+    model = torch.compile(model)
 
     # Printing the model summary
     model.eval()
