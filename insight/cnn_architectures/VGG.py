@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -67,7 +69,7 @@ class VGG(nn.Module):
             nn.Dropout(0.5),
             nn.LazyLinear(num_classes),
         )
-        self.blocks = nn.Sequential(blocks)
+        self.blocks = nn.Sequential(OrderedDict(blocks))
 
     def forward(self, x):
         out = self.blocks(x)
