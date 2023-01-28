@@ -2,7 +2,7 @@
 
 # chmod +x setup.sh
 
-pip install --upgrade --pre torch torchvision torchaudio --force-reinstall --index-url https://download.pytorch.org/whl/nightly/cu116
+pip install --upgrade --pre torch torchvision torchaudio --force-reinstall --index-url https://download.pytorch.org/whl/nightly/cu117
 
 pip install torchinfo wandb
 
