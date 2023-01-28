@@ -103,7 +103,7 @@ def main():
         "--architecture",
         type=str,
         default="LeNet5",
-        help="CNN architecture to use - LeNet5, AlexNet, ...",
+        help="CNN architecture to use - LeNet5, AlexNet, VGG(11, 13, 16-1, 16, 19)",
     )
 
     # Image x and y dimensions
