@@ -73,6 +73,19 @@ class VGG(nn.Module):
         )
         self.blocks = nn.Sequential(OrderedDict(blocks))
 
+        self.apply(self._init_weights)
+
     def forward(self, x):
         out = self.blocks(x)
         return out
+
+    def _init_weights(self):
+        # Initlize weights with glorot uniform
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                nn.init.xavier_uniform_(m.weight)
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+            elif isinstance(m, nn.Linear):
+                nn.init.xavier_uniform_(m.weight)
+                nn.init.zeros_(m.bias)
