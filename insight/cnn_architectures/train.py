@@ -162,11 +162,12 @@ def main():
     if model._init_weights is not None:
         model.apply(model._init_weights)
 
-    model = torch.compile(model)
-
     # Printing the model summary
     model.eval()
+    print(model)
     summary(model, input_size=test_input_size)
+
+    model = torch.compile(model)
 
     # Defining the loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
