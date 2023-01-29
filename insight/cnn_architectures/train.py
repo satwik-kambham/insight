@@ -114,6 +114,10 @@ def main():
         "--device", type=str, default="cpu", help="device to use for training / testing"
     )
 
+    parser.add_argument(
+        "--nightly", action="store_true", help="Use pytorch 2.0 to compile model"
+    )
+
     args = parser.parse_args()
 
     hyperparameters["epochs"] = args.epochs
@@ -167,7 +171,8 @@ def main():
     print(model)
     summary(model, input_size=test_input_size)
 
-    model = torch.compile(model)
+    if args.nightly:
+        model = torch.compile(model)
 
     # Defining the loss function and optimizer
     loss_fn = nn.CrossEntropyLoss()
