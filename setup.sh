@@ -18,6 +18,8 @@ rm -f Mambaforge-Linux-x86_64.sh
 # Install dependencies
 ~/mambaforge/bin/mamba install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch-nightly -c nvidia -y
 
+~/mambaforge/bin/mamba install networkx -y
+
 ~/mambaforge/bin/mamba install pytorch-lightning torchinfo wandb -c conda-forge -y
 
 ~/mambaforge/bin/mamba install -c "nvidia/label/cuda-11.7.0" cuda-nvcc -y
