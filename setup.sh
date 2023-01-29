@@ -23,3 +23,8 @@ mamba install torchinfo -c conda-forge
 mamba install wandb -c conda-forge
 
 conda install -c "nvidia/label/cuda-11.7.0" cuda-nvcc
+
+# Update repository
+cd insight
+git pull
+cd ..
