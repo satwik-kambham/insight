@@ -159,8 +159,8 @@ def main():
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 
-    if model._init_weights is not None:
-        model.apply(model._init_weights)
+    if hasattr(model, "_init_weights"):
+        model._init_weights()
 
     # Printing the model summary
     model.eval()
