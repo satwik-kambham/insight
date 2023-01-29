@@ -73,8 +73,6 @@ class VGG(nn.Module):
         )
         self.blocks = nn.Sequential(OrderedDict(blocks))
 
-        self.apply(self._init_weights)
-
     def forward(self, x):
         out = self.blocks(x)
         return out

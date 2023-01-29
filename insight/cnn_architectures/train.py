@@ -159,6 +159,9 @@ def main():
     test_input = torch.randn(test_input_size)
     test_output = model(test_input)
 
+    if model._init_weights is not None:
+        model.apply(model._init_weights)
+
     model = torch.compile(model)
 
     # Printing the model summary
