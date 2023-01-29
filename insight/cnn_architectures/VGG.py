@@ -77,7 +77,7 @@ class VGG(nn.Module):
         out = self.blocks(x)
         return out
 
-    def _init_weights(self, module):
+    def _init_weights(module):
         # Initlize weights with glorot uniform
         if isinstance(module, nn.Conv2d):
             nn.init.xavier_uniform_(module.weight)
