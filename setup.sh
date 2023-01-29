@@ -1,13 +1,25 @@
 #!/bin/bash
 
-# chmod +x setup.sh
+rm -f Mambaforge-pypy3-Linux-x86_64.sh
 
-cd insight
-git pull
-cd ..
+# Install Mambaforge (mamba)
+wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-x86_64.sh"
 
-pip install --upgrade --pre torch torchvision torchaudio --force-reinstall --index-url https://download.pytorch.org/whl/nightly/cu117
+bash Mambaforge-pypy3-Linux-x86_64.sh
 
-pip install torchinfo wandb
+# Create and activate environment
+mamba create -n insight python=3.10
+mamba activate insight
 
-wandb login
+# Install dependencies
+mamba install numpy pandas matplotlib seaborn bokeh
+mamba install jupyter jupyterlab ipython ipykernel
+
+mamba install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch-nightly -c nvidia
+
+mamba install pytorch-lightning -c conda-forge
+mamba install torchinfo -c conda-forge
+
+mamba install wandb -c conda-forge
+
+conda install -c "nvidia/label/cuda-11.7.0" cuda-nvcc
