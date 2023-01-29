@@ -13,7 +13,7 @@ rm -f Mambaforge-pypy3-Linux-x86_64.sh
 
 # Install dependencies
 ~/mambaforge-pypy3/bin/mamba install numpy pandas matplotlib seaborn bokeh -y
-~/mambaforge-pypy3/bin/mamba mamba install jupyter jupyterlab ipython ipykernel -y
+~/mambaforge-pypy3/bin/mamba install jupyter jupyterlab ipython ipykernel -y
 
 ~/mambaforge-pypy3/bin/mamba install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch-nightly -c nvidia -y
 
