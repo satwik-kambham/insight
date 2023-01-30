@@ -85,7 +85,6 @@ def main():
     parser.add_argument(
         "-d", "--data", type=str, default="./data", help="path to dataset"
     )
-    parser.add_argument("-s", type=bool, default=False, help="save model")
 
     parser.add_argument("-e", "--epochs", type=int, default=10, help="number of epochs")
     parser.add_argument("-b", "--batch_size", type=int, default=64, help="batch size")
@@ -116,6 +115,10 @@ def main():
 
     parser.add_argument(
         "--nightly", action="store_true", help="Use pytorch 2.0 to compile model"
+    )
+
+    parser.add_argument(
+        "-s", "--save", action="store_true", help="Save model checkpoint"
     )
 
     args = parser.parse_args()
