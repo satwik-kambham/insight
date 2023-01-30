@@ -13,6 +13,7 @@ from dataloaders import load_data
 from LeNet import LeNet5
 from AlexNet import AlexNet
 from VGG import *
+from GoogLeNet import GoogLeNet
 
 # Hyperparameters for training
 hyperparameters = {
@@ -102,7 +103,7 @@ def main():
         "--architecture",
         type=str,
         default="LeNet5",
-        help="CNN architecture to use - LeNet5, AlexNet, VGG(11, 13, 16-1, 16, 19)",
+        help="CNN architecture to use - LeNet5, AlexNet, VGG(11, 13, 16-1, 16, 19), GoogLeNet",
     )
 
     # Image x and y dimensions
@@ -160,6 +161,8 @@ def main():
         model = VGG(VGG_D, num_classes=num_classes)
     elif hyperparameters["architecture"] == "VGG19":
         model = VGG(VGG_E, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "GoogLeNet":
+        model = GoogLeNet(num_classes=num_classes)
     else:
         raise NotImplementedError
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
