@@ -170,11 +170,11 @@ def main():
     elif hyperparameters["architecture"] == "ResNet34":
         model = ResNet(RESNET_34, num_classes=num_classes)
     elif hyperparameters["architecture"] == "ResNet50":
-        model = ResNet(RESNET_50, num_classes=num_classes)
+        model = ResNet(RESNET_50, block="bottleneck", num_classes=num_classes)
     elif hyperparameters["architecture"] == "ResNet101":
-        model = ResNet(RESNET_101, num_classes=num_classes)
+        model = ResNet(RESNET_101, block="bottleneck", num_classes=num_classes)
     elif hyperparameters["architecture"] == "ResNet152":
-        model = ResNet(RESNET_152, num_classes=num_classes)
+        model = ResNet(RESNET_152, block="bottleneck", num_classes=num_classes)
     else:
         raise NotImplementedError
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])

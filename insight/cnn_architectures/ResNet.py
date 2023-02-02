@@ -4,7 +4,7 @@ import torch.nn as nn
 class SimpleResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, set_stride=False):
         super().__init__()
-        stride = 1 if in_channels == out_channels and set_stride else 2
+        stride = 2 if in_channels != out_channels and set_stride else 1
 
         self.conv1 = nn.LazyConv2d(
             out_channels,
@@ -40,12 +40,12 @@ class BottleneckResidualBlock(nn.Module):
         self, in_channels, out_channels, identity_mapping=False, set_stride=False
     ):
         super().__init__()
-        stride = 1 if in_channels == out_channels and set_stride else 2
+        stride = 2 if in_channels != out_channels and set_stride else 1
 
         self.conv1 = nn.LazyConv2d(
             out_channels,
             kernel_size=1,
-            padding="same" if stride == 1 else 1,
+            padding="same" if stride == 1 else 0,
             stride=stride,
         )
         self.conv2 = nn.LazyConv2d(out_channels, kernel_size=3, padding="same")
@@ -82,15 +82,14 @@ RESNET_152 = [3, 8, 36, 3]
 
 
 class ResNet(nn.Module):
-    def __init__(self, arch=RESNET_18, num_classes=256):
+    def __init__(self, arch=RESNET_18, block="simple", num_classes=256):
         super().__init__()
-        block = "simple" if arch == RESNET_18 or arch == RESNET_34 else "bottleneck"
         self.conv1 = nn.Sequential(
-            nn.LazyConv2d(64, kernel_size=7, stride=2),
+            nn.LazyConv2d(64, kernel_size=7, stride=2, padding=3),
             nn.LazyBatchNorm2d(),
             nn.ReLU(),
         )
-        self.maxpool = nn.MaxPool2d(3, stride=2)
+        self.maxpool = nn.MaxPool2d(3, stride=2, padding=1)
         self.conv2 = self._make_layer(64, 64, arch[0], set_stride=False, block=block)
         self.conv3 = self._make_layer(64, 128, arch[1], block=block)
         self.conv4 = self._make_layer(128, 256, arch[2], block=block)
@@ -114,6 +113,7 @@ class ResNet(nn.Module):
                     set_stride=set_stride,
                 )
             )
+            set_stride = False
         return nn.Sequential(*layers)
 
     def forward(self, x):
