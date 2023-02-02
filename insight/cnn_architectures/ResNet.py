@@ -86,11 +86,11 @@ class ResNet(nn.Module):
         super().__init__()
         block = "simple" if arch == RESNET_18 or arch == RESNET_34 else "bottleneck"
         self.conv1 = nn.Sequential(
-            nn.LazyConv2d(64, kernel_size=7, stride=2, padding="same"),
+            nn.LazyConv2d(64, kernel_size=7, stride=2),
             nn.LazyBatchNorm2d(),
             nn.ReLU(),
         )
-        self.maxpool = nn.MaxPool2d(3, stride=2, padding="same")
+        self.maxpool = nn.MaxPool2d(3, stride=2)
         self.conv2 = self._make_layer(64, 64, arch[0], set_stride=False, block=block)
         self.conv3 = self._make_layer(64, 128, arch[1], block=block)
         self.conv4 = self._make_layer(128, 256, arch[2], block=block)
