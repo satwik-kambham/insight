@@ -11,6 +11,7 @@ from dataloaders import load_data
 from LeNet import LeNet5
 from AlexNet import AlexNet
 from VGG import VGG, VGG_A, VGG_B, VGG_C, VGG_D, VGG_E
+from ResNet import ResNet, RESNET_18, RESNET_34, RESNET_50, RESNET_101, RESNET_152
 from GoogLeNet import GoogLeNet
 
 # Hyperparameters for training
@@ -103,7 +104,8 @@ def main():
         type=str,
         default="LeNet5",
         help="CNN architecture to use - LeNet5, AlexNet, \
-            VGG(11, 13, 16-1, 16, 19), GoogLeNet",
+            VGG(11, 13, 16-1, 16, 19), GoogLeNet, \
+                ResNet(18, 34, 50, 101, 152)",
     )
 
     # Image x and y dimensions
@@ -163,6 +165,16 @@ def main():
         model = VGG(VGG_E, num_classes=num_classes)
     elif hyperparameters["architecture"] == "GoogLeNet":
         model = GoogLeNet(num_classes=num_classes)
+    elif hyperparameters["architecture"] == "ResNet18":
+        model = ResNet(RESNET_18, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "ResNet34":
+        model = ResNet(RESNET_34, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "ResNet50":
+        model = ResNet(RESNET_50, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "ResNet101":
+        model = ResNet(RESNET_101, num_classes=num_classes)
+    elif hyperparameters["architecture"] == "ResNet152":
+        model = ResNet(RESNET_152, num_classes=num_classes)
     else:
         raise NotImplementedError
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
