@@ -1,7 +1,6 @@
 from collections import OrderedDict
 
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 VGG_A = (

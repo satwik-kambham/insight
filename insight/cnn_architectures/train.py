@@ -1,9 +1,7 @@
-import os
 import argparse
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 
 from torchinfo import summary
@@ -12,7 +10,7 @@ import wandb
 from dataloaders import load_data
 from LeNet import LeNet5
 from AlexNet import AlexNet
-from VGG import *
+from VGG import VGG, VGG_A, VGG_B, VGG_C, VGG_D, VGG_E
 from GoogLeNet import GoogLeNet
 
 # Hyperparameters for training
@@ -75,7 +73,8 @@ def train(model, loss_fn, optimizer, train_loader, val_loader, epochs, device):
             }
         )
         print(
-            f"Epoch: {epoch}/{epochs}, Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}"
+            f"Epoch: {epoch}/{epochs}, Train Loss: {train_loss:.4f}, \
+                Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}"
         )
     return train_loss, val_loss, val_accuracy
 
@@ -103,7 +102,8 @@ def main():
         "--architecture",
         type=str,
         default="LeNet5",
-        help="CNN architecture to use - LeNet5, AlexNet, VGG(11, 13, 16-1, 16, 19), GoogLeNet",
+        help="CNN architecture to use - LeNet5, AlexNet, \
+            VGG(11, 13, 16-1, 16, 19), GoogLeNet",
     )
 
     # Image x and y dimensions
@@ -167,7 +167,7 @@ def main():
         raise NotImplementedError
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
     test_input = torch.randn(test_input_size)
-    test_output = model(test_input)
+    _ = model(test_input)
 
     if hasattr(model, "_init_weights"):
         model._init_weights()
