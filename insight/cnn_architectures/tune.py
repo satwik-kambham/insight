@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-import wandb
+# import wandb
 
 from ray import tune, air
 from ray.air import session
@@ -123,7 +123,7 @@ def main():
     if args.img_x != -1 or args.img_y != -1:
         hyperparameters["img_shape"] = (args.img_x, args.img_y)
 
-    wandb.init(project="cnn-architectures", config=hyperparameters)
+    # wandb.init(project="cnn-architectures", config=hyperparameters)
 
     def objective(config):
         # Loading the dataset
