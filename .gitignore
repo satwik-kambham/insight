@@ -7,5 +7,8 @@ insight/datasets/data
 # Ignore python cache
 __pycache__
 
+# Lightning Logs
+lightning_logs/
+
 # wand
 wandb

@@ -90,7 +90,10 @@ def parse_args():
     parser.add_argument("--img_y", type=int, default=-1, help="image y dimension")
 
     parser.add_argument(
-        "--device", type=str, default="cpu", help="device to use for training / testing"
+        "--device",
+        type=str,
+        default="auto",
+        help="device to use for training / testing",
     )
 
     parser.add_argument(
@@ -160,7 +163,7 @@ def main():
 
     hyperparameters["img_shape"] = img_shape
 
-    wandb.init(project="cnn-architectures", config=hyperparameters)
+    # wandb.init(project="cnn-architectures", config=hyperparameters)
 
     model = get_model(hyperparameters["architecture"], num_classes)
 
@@ -176,9 +179,18 @@ def main():
 
     classifier = Classifier(model, hyperparameters)
 
+    if args.device == "auto":
+        accelerator = "auto"
+    elif args.device == "cpu":
+        accelerator = None
+    elif args.device == "gpu" or args.device == "cuda":
+        accelerator = "gpu"
+    else:
+        raise NotImplementedError
+
     trainer = pl.Trainer(
-        accelerator="auto",
-        enable_checkpointing=args.s,
+        accelerator=accelerator,
+        enable_checkpointing=args.save,
         max_epochs=hyperparameters["epochs"],
     )
 
