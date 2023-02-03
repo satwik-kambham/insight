@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from torchinfo import summary
+import pytorch_lightning as pl
 import wandb
 
 from dataloaders import load_data
@@ -28,59 +28,36 @@ hyperparameters = {
 }
 
 
-def train_loop(model, loss_fn, optimizer, train_loader, device):
-    model.train()
-    train_loss = 0
-    for batch_idx, (data, target) in enumerate(train_loader):
-        optimizer.zero_grad()
-        data = data.to(device)
-        target = target.to(device)
-        output = model(data)
-        loss = loss_fn(output, target)
-        loss.backward()
-        optimizer.step()
-        train_loss += loss.item()
-    train_loss /= batch_idx * data.shape[0]
-    return train_loss
+class Classifier(pl.LightningModule):
+    def __init__(self, architecture, hyperparameters):
+        super().__init__()
+
+        self.save_hyperparameters("hyperparameters")
+
+        self.classifier = architecture
+        self.hyperparameters = hyperparameters
+
+    def forward(self, x):
+        return self.classifier(x)
+
+    def training_step(self, batch, batch_idx):
+        data, target = batch
+        output = self(data)
+        loss = nn.functional.cross_entropy(output, target)
+        self.log("train_loss", loss)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        data, target = batch
+        output = self(data)
+        loss = nn.functional.cross_entropy(output, target)
+        self.log("val_loss", loss)
+
+    def configure_optimizers(self):
+        return optim.Adam(self.parameters(), lr=self.hyperparameters["lr"])
 
 
-def val_loop(model, loss_fn, val_loader, device):
-    model.eval()
-    val_loss = 0
-    correct = 0
-    with torch.no_grad():
-        for batch_idx, (data, target) in enumerate(val_loader):
-            data = data.to(device)
-            target = target.to(device)
-            output = model(data)
-            val_loss += loss_fn(output, target).item()
-            pred = output.argmax(dim=1, keepdim=True)
-            correct += pred.eq(target.view_as(pred)).sum().item()
-    val_loss /= batch_idx * data.shape[0]
-    val_accuracy = correct / (batch_idx * data.shape[0])
-    return val_loss, val_accuracy
-
-
-def train(model, loss_fn, optimizer, train_loader, val_loader, epochs, device):
-    model = model.to(device)
-    for epoch in range(1, epochs + 1):
-        train_loss = train_loop(model, loss_fn, optimizer, train_loader, device)
-        val_loss, val_accuracy = val_loop(model, loss_fn, val_loader, device)
-        wandb.log(
-            {
-                "train_loss": train_loss,
-                "val_loss": val_loss,
-                "val_accuracy": val_accuracy,
-            }
-        )
-        print(
-            f"Epoch: {epoch}/{epochs}, Train Loss: {train_loss:.4f}, \
-                Val Loss: {val_loss:.4f}, Val Accuracy: {val_accuracy:.4f}"
-        )
-    return train_loss, val_loss, val_accuracy
-
-
-def main():
+def parse_args():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -125,6 +102,45 @@ def main():
     )
 
     args = parser.parse_args()
+    return args
+
+
+def get_model(architecture, num_classes):
+    # Creating the model
+    if architecture == "LeNet5":
+        model = LeNet5(num_classes=num_classes)
+    elif architecture == "AlexNet":
+        model = AlexNet(num_classes=num_classes)
+    elif architecture == "VGG11":
+        model = VGG(VGG_A, num_classes=num_classes)
+    elif architecture == "VGG13":
+        model = VGG(VGG_B, num_classes=num_classes)
+    elif architecture == "VGG16-1":
+        model = VGG(VGG_C, num_classes=num_classes)
+    elif architecture == "VGG16":
+        model = VGG(VGG_D, num_classes=num_classes)
+    elif architecture == "VGG19":
+        model = VGG(VGG_E, num_classes=num_classes)
+    elif architecture == "GoogLeNet":
+        model = GoogLeNet(num_classes=num_classes)
+    elif architecture == "ResNet18":
+        model = ResNet(RESNET_18, num_classes=num_classes)
+    elif architecture == "ResNet34":
+        model = ResNet(RESNET_34, num_classes=num_classes)
+    elif architecture == "ResNet50":
+        model = ResNet(RESNET_50, block="bottleneck", num_classes=num_classes)
+    elif architecture == "ResNet101":
+        model = ResNet(RESNET_101, block="bottleneck", num_classes=num_classes)
+    elif architecture == "ResNet152":
+        model = ResNet(RESNET_152, block="bottleneck", num_classes=num_classes)
+    else:
+        raise NotImplementedError
+
+    return model
+
+
+def main():
+    args = parse_args()
 
     hyperparameters["epochs"] = args.epochs
     hyperparameters["train_batch_size"] = args.batch_size
@@ -146,37 +162,8 @@ def main():
 
     wandb.init(project="cnn-architectures", config=hyperparameters)
 
-    device = torch.device(args.device)
+    model = get_model(hyperparameters["architecture"], num_classes)
 
-    # Creating the model
-    if hyperparameters["architecture"] == "LeNet5":
-        model = LeNet5(num_classes=num_classes)
-    elif hyperparameters["architecture"] == "AlexNet":
-        model = AlexNet(num_classes=num_classes)
-    elif hyperparameters["architecture"] == "VGG11":
-        model = VGG(VGG_A, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "VGG13":
-        model = VGG(VGG_B, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "VGG16-1":
-        model = VGG(VGG_C, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "VGG16":
-        model = VGG(VGG_D, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "VGG19":
-        model = VGG(VGG_E, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "GoogLeNet":
-        model = GoogLeNet(num_classes=num_classes)
-    elif hyperparameters["architecture"] == "ResNet18":
-        model = ResNet(RESNET_18, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "ResNet34":
-        model = ResNet(RESNET_34, num_classes=num_classes)
-    elif hyperparameters["architecture"] == "ResNet50":
-        model = ResNet(RESNET_50, block="bottleneck", num_classes=num_classes)
-    elif hyperparameters["architecture"] == "ResNet101":
-        model = ResNet(RESNET_101, block="bottleneck", num_classes=num_classes)
-    elif hyperparameters["architecture"] == "ResNet152":
-        model = ResNet(RESNET_152, block="bottleneck", num_classes=num_classes)
-    else:
-        raise NotImplementedError
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
     test_input = torch.randn(test_input_size)
     _ = model(test_input)
@@ -184,38 +171,18 @@ def main():
     if hasattr(model, "_init_weights"):
         model._init_weights()
 
-    # Printing the model summary
-    model.eval()
-    print(model)
-    summary(model, input_size=test_input_size)
-
     if args.nightly:
         model = torch.compile(model)
 
-    # Defining the loss function and optimizer
-    loss_fn = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=hyperparameters["lr"])
+    classifier = Classifier(model, hyperparameters)
 
-    wandb.watch(model)
-
-    # Training the model
-    train_loss, val_loss, val_accuracy = train(
-        model,
-        loss_fn,
-        optimizer,
-        train_loader,
-        val_loader,
-        hyperparameters["epochs"],
-        device,
+    trainer = pl.Trainer(
+        accelerator="auto",
+        enable_checkpointing=args.s,
+        max_epochs=hyperparameters["epochs"],
     )
 
-    print(f"Train Loss: {train_loss:.4f}")
-    print(f"Val Loss: {val_loss:.4f}")
-    print(f"Val Accuracy: {val_accuracy:.4f}")
-
-    # Saving the model
-    if args.s:
-        torch.save(model.state_dict(), "model.pth")
+    trainer.fit(classifier, train_loader, val_loader)
 
 
 if __name__ == "__main__":
