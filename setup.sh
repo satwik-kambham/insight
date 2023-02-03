@@ -16,9 +16,9 @@ rm -f Mambaforge-Linux-x86_64.sh
 
 ~/mambaforge/bin/mamba install networkx -y
 
-~/mambaforge/bin/mamba install pytorch-lightning torchinfo wandb -c conda-forge -y
+~/mambaforge/bin/mamba install pytorch-lightning torchmetrics torchinfo wandb -y
 
-~/mambaforge/bin/mamba install scipy -c conda-forge -y
+~/mambaforge/bin/mamba install scipy -y
 
 ~/mambaforge/bin/mamba install -c "nvidia/label/cuda-11.7.0" cuda-nvcc -y
 

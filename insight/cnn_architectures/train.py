@@ -5,7 +5,9 @@ import torch.nn as nn
 import torch.optim as optim
 
 import pytorch_lightning as pl
-import wandb
+from pytorch_lightning.loggers.wandb import WandbLogger
+from pytorch_lightning.loggers import TensorBoardLogger
+import torchmetrics as tm
 
 from dataloaders import load_data
 from LeNet import LeNet5
@@ -29,13 +31,18 @@ hyperparameters = {
 
 
 class Classifier(pl.LightningModule):
-    def __init__(self, architecture, hyperparameters):
+    def __init__(self, architecture, hyperparameters, num_classes):
         super().__init__()
 
-        self.save_hyperparameters("hyperparameters")
+        self.save_hyperparameters("hyperparameters", "num_classes")
 
         self.classifier = architecture
         self.hyperparameters = hyperparameters
+        self.num_classes = num_classes
+
+        self.criterion = nn.CrossEntropyLoss()
+
+        self.accuracy = tm.Accuracy(task="multiclass", num_classes=num_classes)
 
     def forward(self, x):
         return self.classifier(x)
@@ -43,15 +50,18 @@ class Classifier(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         data, target = batch
         output = self(data)
-        loss = nn.functional.cross_entropy(output, target)
+        loss = self.criterion(output, target)
         self.log("train_loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
         data, target = batch
         output = self(data)
-        loss = nn.functional.cross_entropy(output, target)
+        loss = self.criterion(output, target)
+        pred = output.argmax(dim=1, keepdim=True)
         self.log("val_loss", loss)
+        self.accuracy(pred, target)
+        self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.hyperparameters["lr"])
@@ -163,8 +173,6 @@ def main():
 
     hyperparameters["img_shape"] = img_shape
 
-    # wandb.init(project="cnn-architectures", config=hyperparameters)
-
     model = get_model(hyperparameters["architecture"], num_classes)
 
     test_input_size = (1, num_channels, *hyperparameters["img_shape"])
@@ -177,7 +185,7 @@ def main():
     if args.nightly:
         model = torch.compile(model)
 
-    classifier = Classifier(model, hyperparameters)
+    classifier = Classifier(model, hyperparameters, num_classes)
 
     if args.device == "auto":
         accelerator = "auto"
@@ -188,10 +196,14 @@ def main():
     else:
         raise NotImplementedError
 
+    wandb_logger = WandbLogger(project="cnn-architectures")
+    tensorboard_logger = TensorBoardLogger()
+
     trainer = pl.Trainer(
         accelerator=accelerator,
         enable_checkpointing=args.save,
         max_epochs=hyperparameters["epochs"],
+        logger=[wandb_logger, tensorboard_logger],
     )
 
     trainer.fit(classifier, train_loader, val_loader)
