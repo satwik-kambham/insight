@@ -6,9 +6,8 @@ import torch.optim as optim
 
 # import wandb
 
-from ray import tune, air
-from ray.air import session
-from ray.tune.search.optuna import OptunaSearch
+import optuna
+from optuna.trial import TrialState
 
 from dataloaders import load_data
 from LeNet import LeNet5
@@ -125,7 +124,7 @@ def main():
 
     # wandb.init(project="cnn-architectures", config=hyperparameters)
 
-    def objective(config):
+    def objective(trail):
         # Loading the dataset
         train_loader, val_loader, num_classes, img_shape, num_channels = load_data(
             args.data,
@@ -177,11 +176,11 @@ def main():
 
         # Defining the loss function and optimizer
         loss_fn = nn.CrossEntropyLoss()
-        optimizer = optim.Adam(
-            model.parameters(), lr=config["lr"], momentum=config["momentum"]
-        )
+        lr = trail.suggest_loguniform("lr", 1e-4, 1e-1)
+        momentum = trail.suggest_uniform("momentum", 0.1, 0.9)
+        optimizer = optim.Adam(model.parameters(), lr=lr, momentum=momentum)
 
-        while True:
+        for epoch in range(hyperparameters["epochs"]):
             # Training the model
             train_loss, val_loss, val_accuracy = train(
                 model,
@@ -191,31 +190,33 @@ def main():
                 val_loader,
                 device,
             )
-            session.report({"val_accuracy": val_accuracy})
 
-    search_space = {
-        "lr": tune.loguniform(1e-4, 1e-1),
-        "momentum": tune.uniform(0.1, 0.9),
-    }
-    algo = OptunaSearch()
+            trail.report(val_accuracy, epoch)
 
-    tuner = tune.Tuner(
-        objective,
-        tune_config=tune.TuneConfig(
-            metric="val_accuracy",
-            mode="max",
-            search_alg=algo,
-        ),
-        run_config=air.RunConfig(
-            stop={"training_iteration": hyperparameters["epochs"]},
-        ),
-        param_space=search_space,
-    )
+            if trail.should_prune():
+                raise optuna.TrialPruned()
 
-    results = tuner.fit()
+        return val_accuracy
 
-    print("Best hyperparameters found were: ", results.get_best_result().config)
-    print(results.get_dataframe())
+    study = optuna.create_study(direction="maximize")
+    study.optimize(objective, n_trials=100)
+
+    pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
+    complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
+
+    print("Study statistics: ")
+    print("  Number of finished trials: ", len(study.trials))
+    print("  Number of pruned trials: ", len(pruned_trials))
+    print("  Number of complete trials: ", len(complete_trials))
+
+    print("Best trial:")
+    trial = study.best_trial
+
+    print("  Value: ", trial.value)
+
+    print("  Params: ")
+    for key, value in trial.params.items():
+        print("    {}: {}".format(key, value))
 
 
 if __name__ == "__main__":
