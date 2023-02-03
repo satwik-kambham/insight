@@ -58,7 +58,7 @@ class Classifier(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        pred = output.argmax(dim=1, keepdim=True)
+        pred = output.argmax(dim=1, keepdim=False)
         self.log("val_loss", loss)
         self.accuracy(pred, target)
         self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
@@ -197,7 +197,7 @@ def main():
         raise NotImplementedError
 
     wandb_logger = WandbLogger(project="cnn-architectures")
-    tensorboard_logger = TensorBoardLogger()
+    tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
     trainer = pl.Trainer(
         accelerator=accelerator,
