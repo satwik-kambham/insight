@@ -177,8 +177,7 @@ def main():
         # Defining the loss function and optimizer
         loss_fn = nn.CrossEntropyLoss()
         lr = trail.suggest_loguniform("lr", 1e-4, 1e-1)
-        momentum = trail.suggest_uniform("momentum", 0.1, 0.9)
-        optimizer = optim.Adam(model.parameters(), lr=lr, momentum=momentum)
+        optimizer = optim.Adam(model.parameters(), lr=lr)
 
         for epoch in range(hyperparameters["epochs"]):
             # Training the model
