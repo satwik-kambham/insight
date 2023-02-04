@@ -12,7 +12,7 @@ bash Mambaforge-Linux-x86_64.sh -b
 rm -f Mambaforge-Linux-x86_64.sh
 
 # Install dependencies
-~/mambaforge/bin/mamba install pytorch torchvision torchaudio pytorch-cuda=11.7 -c pytorch-nightly -c nvidia -y
+~/mambaforge/bin/mamba install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia -y
 
 ~/mambaforge/bin/mamba install networkx -y
 
