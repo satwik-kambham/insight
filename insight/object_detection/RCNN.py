@@ -63,6 +63,10 @@ def get_candidates(img):
             continue
         if w > img_w or h > img_h:
             continue
+        if x + w > img_w or y + h > img_h:
+            continue
+        if x < 0 or y < 0:
+            continue
         candidates.append(list(region["rect"]))
     return candidates
 
@@ -127,8 +131,8 @@ def prep_dataset(dataset, limit):
             cx, cy, cw, ch = x1y1x2y2_to_xywh(candidate)
             tx = (gt_x - cx) / cw
             ty = (gt_y - cy) / ch
-            tw = np.log(gt_w / cw)
-            th = np.log(gt_h / ch)
+            tw = np.log(gt_w / cw, dtype=np.float32)
+            th = np.log(gt_h / ch, dtype=np.float32)
 
             # Add to dataframe
             row = pd.Series(
@@ -140,7 +144,7 @@ def prep_dataset(dataset, limit):
                     "img_path": dataset.images[i],
                     "img_w": img_w,
                     "img_h": img_h,
-                    "offsets": np.array([tx, ty, tw, th]),
+                    "offsets": np.array([tx, ty, tw, th], dtype=np.float32),
                 }
             )
 
@@ -259,19 +263,19 @@ class RCNN(pl.LightningModule):
             param.requires_grad = False
 
         self.classifier = nn.Sequential(
-            nn.LazyLinear(4096),
+            nn.LazyLinear(512),
             nn.ReLU(),
             nn.Dropout(),
-            nn.LazyLinear(4096),
+            nn.LazyLinear(64),
             nn.ReLU(),
             nn.Dropout(),
             nn.LazyLinear(self.num_classes),
         )
         self.bbox_regressor = nn.Sequential(
-            nn.LazyLinear(4096),
+            nn.LazyLinear(512),
             nn.ReLU(),
             nn.Dropout(),
-            nn.LazyLinear(4096),
+            nn.LazyLinear(64),
             nn.ReLU(),
             nn.Dropout(),
             nn.LazyLinear(4),
