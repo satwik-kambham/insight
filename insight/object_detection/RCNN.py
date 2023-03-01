@@ -217,6 +217,32 @@ class RCNNDataset(data.Dataset):
         return img, offset, cls
 
 
+class RCNN_DataModule(pl.LightningDataModule):
+    def __init__(self, data_dir, batch_size, num_workers=0, padding=5, img_limit=None):
+        super().__init__()
+        self.data_dir = data_dir
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+        self.padding = padding
+        self.img_limit = img_limit
+
+    def setup(self, stage=None):
+        self.dataset = RCNNDataset(self.data_dir, self.padding, self.img_limit)
+        self.train_dataset, self.val_dataset = data.random_split(
+            self.dataset, [0.7, 0.3]
+        )
+
+    def train_dataloader(self):
+        return data.DataLoader(
+            self.train_dataset, batch_size=self.batch_size, num_workers=self.num_workers
+        )
+
+    def val_dataloader(self):
+        return data.DataLoader(
+            self.val_dataset, batch_size=self.batch_size, num_workers=self.num_workers
+        )
+
+
 class RCNN(pl.LightningModule):
     def __init__(self, num_classes, lr=0.001):
         super().__init__()
@@ -228,6 +254,10 @@ class RCNN(pl.LightningModule):
         self.preprocess = weights.transforms()
         self.backbone = tv.models.vgg16_bn(weights=tv.models.VGG16_BN_Weights.DEFAULT)
         self.backbone.classifier = nn.Identity()
+
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+
         self.classifier = nn.Sequential(
             nn.LazyLinear(4096),
             nn.ReLU(),
@@ -251,6 +281,7 @@ class RCNN(pl.LightningModule):
         self.classification_loss_fn = nn.CrossEntropyLoss()
 
     def forward(self, x):
+        self.backbone.eval()
         x = self.preprocess(x)
         x = self.backbone(x)
         x = x.view(x.size(0), -1)
