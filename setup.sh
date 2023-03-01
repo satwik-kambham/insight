@@ -19,6 +19,8 @@ rm -f Mambaforge-Linux-x86_64.sh
 ~/mambaforge/bin/mamba install -c "nvidia/label/cuda-11.7.0" cuda-nvcc -y
 ~/mambaforge/bin/mamba install ray-tune optuna -y
 
+~/mambaforge/bin/mamba install ray-tune ipython -y
+
 ~/mambaforge/bin/pip install selectivesearch
 
 # Update repository
