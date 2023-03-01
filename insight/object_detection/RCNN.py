@@ -8,10 +8,11 @@ from torch.utils import data
 import torchvision as tv
 
 import pytorch_lightning as pl
+from pytorch_lightning.cli import LightningCLI
 
 from selectivesearch import selective_search
 
-from .dataloader import OxfordIIITPet
+from dataloader import OxfordIIITPet
 
 
 class SimplifyAnnotation(object):
@@ -300,3 +301,11 @@ class RCNN(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)
+
+
+def cli_main():
+    cli = LightningCLI(RCNN, RCNN_DataModule)
+
+
+if __name__ == "__main__":
+    cli_main()
