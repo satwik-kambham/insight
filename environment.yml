@@ -1,0 +1,33 @@
+name: insight
+channels:
+  - pytorch
+  - nvidia
+  - nvidia/label/cuda-11.7.0
+  - conda-forge
+dependencies:
+  - pytorch
+  - torchvision
+  - torchaudio
+  - pytorch-cuda=11.7
+  - torchmetrics
+  - torchinfo
+  - wandb
+  - scipy
+  - ray-tune
+  - optuna
+  - cuda-nvcc
+  - numpy
+  - pandas
+  - matplotlib
+  - bokeh
+  - seaborn
+  - jupyter
+  - jupyterlab
+  - ipython
+  - ipywidgets
+  - wandb
+
+  - pip:
+      - selectivesearch
+      - 'lightning[extra]'
+      - gradient
