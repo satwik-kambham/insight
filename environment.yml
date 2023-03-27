@@ -31,3 +31,5 @@ dependencies:
       - selectivesearch
       - 'lightning[extra]'
       - gradient
+      - 'black[jupyter]'
+      - flake8
