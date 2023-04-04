@@ -27,7 +27,3 @@ RUN rm -f environment.yml
 
 # Activate insight environment
 RUN echo "conda activate insight" >> ~/.bashrc
-
-# Start jupyterlab and expose ports
-EXPOSE 8888
-CMD "$env_bin/jupyter" lab --allow-root --ip=0.0.0.0 --no-browser --LabApp.trust_xheaders=True --LabApp.disable_check_xsrf=False --LabApp.allow_remote_access=True --LabApp.allow_origin='*'
