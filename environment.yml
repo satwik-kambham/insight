@@ -4,6 +4,7 @@ channels:
   - nvidia
   - nvidia/label/cuda-11.7.0
   - conda-forge
+  - huggingface
 dependencies:
   - python=3.10
   - pip
@@ -28,6 +29,7 @@ dependencies:
   - ipython
   - ipywidgets
   - wandb
+  - datasets
 
   - pip:
       - selectivesearch
