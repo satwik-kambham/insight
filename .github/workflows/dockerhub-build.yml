@@ -1,9 +1,7 @@
 name: dockerhub-build-and-publish
 
 on:
-  push:
-    branches:
-      - "main"
+  workflow_dispatch
 
 jobs:
   build:
