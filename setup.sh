@@ -1,7 +1,5 @@
 #!/bin/bash
 
-rm -f Mambaforge-Linux-x86_64.sh
-
 # Install Mambaforge (mamba)
 wget "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-x86_64.sh"
 
