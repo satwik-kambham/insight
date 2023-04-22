@@ -27,7 +27,6 @@ class Classifier(pl.LightningModule):
         # D = 1 for unidirectional and 2 for bi-directional
         # hidden state shape => (D * num_layers, batch_size, hidden_size)
         h0 = torch.zeros(self.num_layers, batch_size, self.hidden_size).to(self.device)
-        print(input.dtype, h0.dtype)
         out, hn = self.rnn(input, h0)
         # output shape => (tokens_in_sentence, batch_size, D * hidden_size)
         # hidden_shape => (D * num_layers, batch_size, hidden_size)

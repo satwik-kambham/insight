@@ -30,10 +30,11 @@ dependencies:
   - ipywidgets
   - wandb
   - datasets
-
+  - tensorboard
   - pip:
       - selectivesearch
       - 'lightning[extra]'
       - gradient
       - 'black[jupyter]'
       - flake8
+      - torch-tb-profiler
