@@ -1,8 +1,6 @@
 class CharacterTokenizer:
     def __init__(self):
-        self.tokenizer = {
-            "<pad>": 0
-        }
+        self.tokenizer = {"<pad>": 0}
         self.count = 1
 
     def __call__(self, x):

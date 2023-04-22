@@ -1,6 +1,3 @@
-import torch.nn as nn
-from torch.utils.data import DataLoader
-
 from pytorch_lightning.cli import LightningCLI
 
 from dataset import TREC, RNN_DataModule

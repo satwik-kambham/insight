@@ -85,19 +85,20 @@ class TREC(Dataset):
         self.tokenizer = CharacterTokenizer()
 
         for i in self.dataset:
-            self.tokenizer.train(i['text'])
+            self.tokenizer.train(i["text"])
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        i = self.dataset[idx]
         text = self.dataset[idx]["text"]
         tokens = self.tokenizer.encode(text)
         coarse_label = torch.as_tensor(self.dataset[idx]["coarse_label"])
         fine_label = torch.as_tensor(self.dataset[idx]["fine_label"])
         return (
-            F.one_hot(torch.as_tensor(tokens), num_classes=self.tokenizer.count).float(),
+            F.one_hot(
+                torch.as_tensor(tokens), num_classes=self.tokenizer.count
+            ).float(),
             F.one_hot(coarse_label, num_classes=6).float(),
             F.one_hot(fine_label, num_classes=50).float(),
         )

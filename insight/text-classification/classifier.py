@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 
 import pytorch_lightning as pl
+
 
 class Classifier(pl.LightningModule):
     def __init__(self, vocab_size, hidden_size=30, num_layers=1, lr=0.0001):
@@ -14,13 +14,11 @@ class Classifier(pl.LightningModule):
         self.lr = lr
 
         self.rnn = nn.RNN(self.vocab_size, self.hidden_size, self.num_layers)
-        self.head = nn.Sequential(
-            nn.LazyLinear(6)
-        )
+        self.head = nn.Sequential(nn.LazyLinear(6))
 
         self.criterion = nn.CrossEntropyLoss()
 
-    def forward(self, x):
+    def forward(self, input):
         # input shape => (batch_size, vocab_size, tokens_in_sentence)
         # rnn accepts input of shape => (tokens_in_sentence, batch_size, vocab_size)
         batch_size = input.shape[0]
@@ -53,7 +51,6 @@ class Classifier(pl.LightningModule):
         cls = self.forward(input)
 
         return cls, coarse
-
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.lr)
