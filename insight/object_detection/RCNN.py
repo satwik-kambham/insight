@@ -8,7 +8,6 @@ from torch.utils import data
 import torchvision as tv
 
 import pytorch_lightning as pl
-from pytorch_lightning.cli import LightningCLI
 
 from selectivesearch import selective_search
 
@@ -94,7 +93,6 @@ def prep_dataset(dataset, limit):
     )
 
     for i in range(len(dataset)):
-
         if limit is not None and i >= limit:
             break
 
@@ -301,11 +299,3 @@ class RCNN(pl.LightningModule):
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)
-
-
-def cli_main():
-    cli = LightningCLI(RCNN, RCNN_DataModule)
-
-
-if __name__ == "__main__":
-    cli_main()

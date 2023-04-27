@@ -2,20 +2,22 @@ import torch
 from torchvision import datasets, transforms
 
 
-def load_data(root, hyperparameters):
+def load_data(root, dataset, img_shape, train_batch_size, val_batch_size, num_workers):
     """Load the specified dataset and create the corresponding dataloaders
-    Available datasets:
-        - CIFAR10
-        - Caltech256
-        - Caltech101
-        - fashion_MNIST
 
     Parameters
     ----------
     root : str
         Path where the dataset will be stored
-    hyperparameters : dict
-        dict of hyperparameters
+    dataset : str
+        Available datasets:
+        - CIFAR10
+        - Caltech256
+        - Caltech101
+        - fashion_MNIST
+    img_shape : tuple(int, int)
+        Image shape
+        If None, the default shape for the dataset will be used
 
     Returns
     -------
@@ -30,28 +32,26 @@ def load_data(root, hyperparameters):
     """
     num_classes = 10
     num_channels = 3
-    dataset = hyperparameters["dataset"]
-    img_shape = hyperparameters["img_shape"]
 
     # Loading the dataset
     if dataset == "CIFAR10":
         train_dataset, val_dataset, img_shape = load_CIFAR10(
-            root, hyperparameters["img_shape"]
+            root, img_shape
         )
         num_classes = 10
     elif dataset == "Caltech256":
         train_dataset, val_dataset, img_shape = load_Caltech256(
-            root, hyperparameters["img_shape"]
+            root, img_shape
         )
         num_classes = 257
     elif dataset == "Caltech101":
         train_dataset, val_dataset, img_shape = load_Caltech101(
-            root, hyperparameters["img_shape"]
+            root, img_shape
         )
         num_classes = 101
     elif dataset == "fashion_MNIST":
         train_dataset, val_dataset, img_shape = load_fashion_MNIST(
-            root, hyperparameters["img_shape"]
+            root, img_shape
         )
         num_classes = 10
         num_channels = 1
@@ -61,17 +61,17 @@ def load_data(root, hyperparameters):
     # Creating the dataloaders
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
-        batch_size=hyperparameters["train_batch_size"],
+        batch_size=train_batch_size,
         shuffle=True,
         drop_last=True,
-        num_workers=hyperparameters["train_workers"],
+        num_workers=num_workers,
     )
     val_loader = torch.utils.data.DataLoader(
         val_dataset,
-        batch_size=hyperparameters["val_batch_size"],
+        batch_size=val_batch_size,
         shuffle=False,
         drop_last=True,
-        num_workers=hyperparameters["val_workers"],
+        num_workers=num_workers,
     )
 
     return train_loader, val_loader, num_classes, img_shape, num_channels
