@@ -53,6 +53,13 @@ def load_data(root, dataset, img_shape):
     return train_dataset, val_dataset, num_classes, img_shape, num_channels
 
 
+img_augmentation = transforms.Compose(
+    [
+        transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET),
+    ]
+)
+
+
 def load_CIFAR10(root, img_shape):
     if img_shape is None:
         img_shape = (244, 244)
@@ -60,6 +67,7 @@ def load_CIFAR10(root, img_shape):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
+            img_augmentation,
             transforms.Resize(img_shape),
             transforms.ToTensor(),
         ]
@@ -91,6 +99,7 @@ def load_Caltech256(root, img_shape):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
+            img_augmentation,
             transforms.Resize(img_shape),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
@@ -117,6 +126,7 @@ def load_Caltech101(root, img_shape):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
+            img_augmentation,
             transforms.Resize(img_shape),
             transforms.ToTensor(),
             transforms.Lambda(lambda x: x.repeat(3, 1, 1) if x.shape[0] == 1 else x),
@@ -143,6 +153,7 @@ def load_fashion_MNIST(root, img_shape):
     # Loading the dataset
     img_transform = transforms.Compose(
         [
+            img_augmentation,
             transforms.Resize(img_shape),
             transforms.ToTensor(),
         ]
