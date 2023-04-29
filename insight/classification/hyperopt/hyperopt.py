@@ -162,7 +162,14 @@ def hyperopt(
     params["num_workers"] = num_workers
     params["accelerator"] = accelerator
 
-    search_space = {}
+    search_space = {
+        "lr": tune.loguniform(1e-4, 1e-1),
+        "weight_decay": tune.loguniform(1e-4, 1e-1),
+        "factor": tune.uniform(0.1, 0.9),
+        "patience": tune.randint(1, 10),
+        "threshold": tune.loguniform(1e-4, 1e-2),
+        "train_batch_size": tune.choice([8, 16, 32, 64]),
+    }
 
     algo = OptunaSearch()
 
