@@ -175,7 +175,7 @@ def hyperopt(
         ),
         run_config=air.RunConfig(
             log_to_file=True,
-            stop=("training_iteration", params["epochs"]),
+            stop={"training_iteration": params["epochs"]},
         ),
         param_space=search_space,
     )
