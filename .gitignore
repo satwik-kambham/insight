@@ -2,7 +2,7 @@
 *-test.ipynb
 
 # Ignore datasets
-insight/datasets/data
+datasets
 
 # Ignore python cache
 __pycache__

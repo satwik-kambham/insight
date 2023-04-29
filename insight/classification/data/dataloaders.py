@@ -35,24 +35,16 @@ def load_data(root, dataset, img_shape):
 
     # Loading the dataset
     if dataset == "CIFAR10":
-        train_dataset, val_dataset, img_shape = load_CIFAR10(
-            root, img_shape
-        )
+        train_dataset, val_dataset, img_shape = load_CIFAR10(root, img_shape)
         num_classes = 10
     elif dataset == "Caltech256":
-        train_dataset, val_dataset, img_shape = load_Caltech256(
-            root, img_shape
-        )
+        train_dataset, val_dataset, img_shape = load_Caltech256(root, img_shape)
         num_classes = 257
     elif dataset == "Caltech101":
-        train_dataset, val_dataset, img_shape = load_Caltech101(
-            root, img_shape
-        )
+        train_dataset, val_dataset, img_shape = load_Caltech101(root, img_shape)
         num_classes = 101
     elif dataset == "fashion_MNIST":
-        train_dataset, val_dataset, img_shape = load_fashion_MNIST(
-            root, img_shape
-        )
+        train_dataset, val_dataset, img_shape = load_fashion_MNIST(root, img_shape)
         num_classes = 10
         num_channels = 1
     else:

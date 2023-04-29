@@ -22,8 +22,6 @@ class DataModule(pl.LightningDataModule):
         self.train_batch_size = train_batch_size
         self.val_batch_size = val_batch_size
         self.num_workers = num_workers
-
-    def setup(self, stage=None):
         (
             self.train_dataset,
             self.val_dataset,
@@ -31,6 +29,9 @@ class DataModule(pl.LightningDataModule):
             self.img_shape,
             self.num_channels,
         ) = load_data(self.root, self.dataset, self.img_shape)
+
+    def setup(self, stage=None):
+        pass
 
     def train_dataloader(self):
         return DataLoader(

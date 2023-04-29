@@ -7,7 +7,7 @@ import torch.nn as nn
 from torch.utils import data
 import torchvision as tv
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 
 from selectivesearch import selective_search
 

@@ -3,7 +3,7 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 
 from datasets import load_dataset
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 
 from tokenizer import CharacterTokenizer
 

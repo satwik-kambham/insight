@@ -58,9 +58,7 @@ class OxfordIIITPet(data.Dataset):
                 ).exists():
                     image_ids.append(image_id)
 
-        self.images = [
-            self.images_folder / f"{image_id}.jpg" for image_id in image_ids
-        ]
+        self.images = [self.images_folder / f"{image_id}.jpg" for image_id in image_ids]
         self._bboxs = [self._bboxs_folder / f"{image_id}.xml" for image_id in image_ids]
 
     def _check_exists(self) -> bool:

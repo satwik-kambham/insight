@@ -1,8 +1,8 @@
 import torch
 
-import pytorch_lightning as pl
-from pytorch_lightning.loggers.wandb import WandbLogger
-from pytorch_lightning.loggers import TensorBoardLogger
+import lightning.pytorch as pl
+from lightning.pytorch.loggers.wandb import WandbLogger
+from lightning.pytorch.loggers import TensorBoardLogger
 from torchinfo import summary
 
 import click
@@ -25,14 +25,14 @@ from ..models.ResNet import (
 
 
 model_dict = {
-    "LeNet5": (LeNet5),
-    "AlexNet": (AlexNet),
+    "LeNet5": (LeNet5,),
+    "AlexNet": (AlexNet,),
     "VGG_A": (VGG, VGG_A),
     "VGG_B": (VGG, VGG_B),
     "VGG_C": (VGG, VGG_C),
     "VGG_D": (VGG, VGG_D),
     "VGG_E": (VGG, VGG_E),
-    "GoogLeNet": (GoogLeNet),
+    "GoogLeNet": (GoogLeNet,),
     "ResNet18": (ResNet, RESNET_18, "simple"),
     "ResNet34": (ResNet, RESNET_34, "simple"),
     "ResNet50": (ResNet, RESNET_50, "bottleneck"),
@@ -85,6 +85,7 @@ def train(
     lr,
     epochs,
     accelerator,
+    compile,
 ):
     datamodule = DataModule(
         root=data_dir,
@@ -98,7 +99,7 @@ def train(
         *model_dict[architecture][1:], datamodule.num_classes
     )
 
-    test_input_size = (1, datamodule.num_classes, *datamodule.img_shape)
+    test_input_size = (1, datamodule.num_channels, *datamodule.img_shape)
     test_input = torch.randn(test_input_size)
     _ = model(test_input)
 
@@ -107,7 +108,8 @@ def train(
 
     summary(model, input_data=test_input)
 
-    model = torch.compile(model)
+    if compile:
+        model = torch.compile(model)
 
     classifier = Classifier(model, datamodule.num_classes, lr=lr)
 
