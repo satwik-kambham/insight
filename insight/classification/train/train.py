@@ -70,6 +70,10 @@ model_dict = {
 @click.option("--val_batch_size", type=int, default=64, help="Validation batch size")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
 @click.option("--lr", type=float, default=0.001, help="Learning rate")
+@click.option("--weight_decay", type=float, default=0.0, help="Weight decay")
+@click.option("--factor", type=float, default=0.1, help="Factor")
+@click.option("--patience", type=int, default=3, help="Patience")
+@click.option("--threshold", type=float, default=0.0001, help="Threshold")
 @click.option("--epochs", type=int, default=20, help="Number of epochs")
 @click.option(
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
@@ -83,6 +87,10 @@ def train(
     val_batch_size,
     num_workers,
     lr,
+    weight_decay,
+    factor,
+    patience,
+    threshold,
     epochs,
     accelerator,
     compile,
@@ -111,7 +119,15 @@ def train(
     if compile:
         model = torch.compile(model)
 
-    classifier = Classifier(model, datamodule.num_classes, lr=lr)
+    classifier = Classifier(
+        model,
+        datamodule.num_classes,
+        lr=lr,
+        weight_decay=weight_decay,
+        factor=factor,
+        patience=patience,
+        threshold=threshold,
+    )
 
     wandb_logger = WandbLogger(project="classifiers")
     wandb_logger.log_hyperparams(
