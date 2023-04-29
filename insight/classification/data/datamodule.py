@@ -29,6 +29,7 @@ class DataModule(pl.LightningDataModule):
             self.img_shape,
             self.num_channels,
         ) = load_data(self.root, self.dataset, self.img_shape)
+        self.save_hyperparameters()
 
     def setup(self, stage=None):
         pass

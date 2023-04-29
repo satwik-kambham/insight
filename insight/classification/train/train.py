@@ -114,6 +114,12 @@ def train(
     classifier = Classifier(model, datamodule.num_classes, lr=lr)
 
     wandb_logger = WandbLogger(project="classifiers")
+    wandb_logger.log_hyperparams(
+        {
+            "dataset": dataset,
+            "architecture": architecture,
+        }
+    )
     tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
     trainer = pl.Trainer(
