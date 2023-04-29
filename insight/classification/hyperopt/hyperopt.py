@@ -13,6 +13,7 @@ from ray.tune.search.optuna import OptunaSearch
 import click
 
 from ..data.datamodule import DataModule
+from ..data.dataloaders import load_data
 from ..models.classifier import Classifier
 
 from ..models.LeNet import LeNet5
@@ -81,11 +82,6 @@ def objective(config):
     if hasattr(model, "_init_weights"):
         model._init_weights()
 
-    summary(model, input_data=test_input)
-
-    if compile:
-        model = torch.compile(model)
-
     classifier = Classifier(
         model,
         datamodule.num_classes,
@@ -96,19 +92,20 @@ def objective(config):
         threshold=config["threshold"],
     )
 
-    wandb_logger = WandbLogger(project="classifiers")
-    wandb_logger.log_hyperparams(
-        {
-            "dataset": params["dataset"],
-            "architecture": params["architecture"],
-        }
-    )
-    tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
+    # wandb_logger = WandbLogger(project="classifiers")
+    # wandb_logger.log_hyperparams(
+    #     {
+    #         "dataset": params["dataset"],
+    #         "architecture": params["architecture"],
+    #     }
+    # )
+    # tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
     trainer = pl.Trainer(
         accelerator=params["accelerator"],
-        logger=[wandb_logger, tensorboard_logger],
+        # logger=[wandb_logger, tensorboard_logger],
         callbacks=[TuneReportCallback()],
+        enable_progress_bar=False,
     )
 
     trainer.fit(classifier, datamodule)
@@ -161,6 +158,9 @@ def hyperopt(
     params["val_batch_size"] = val_batch_size
     params["num_workers"] = num_workers
     params["accelerator"] = accelerator
+
+    # Download dataset to data_dir
+    load_data(params["data_dir"], params["dataset"], None)
 
     search_space = {
         "lr": tune.loguniform(1e-4, 1e-1),
