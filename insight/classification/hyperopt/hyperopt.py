@@ -140,10 +140,8 @@ def objective(config):
     """,
 )
 @click.option("--epochs", type=int, default=10, help="Training batch size")
-@click.option("--train_batch_size", type=int, default=64, help="Training batch size")
 @click.option("--val_batch_size", type=int, default=64, help="Validation batch size")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
-@click.option("--lr", type=float, default=0.001, help="Learning rate")
 @click.option(
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
 )
