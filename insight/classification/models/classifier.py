@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.optim as optim
 
-import pytorch_lightning as pl
+import lightning.pytorch as pl
 import torchmetrics as tm
 
 
@@ -9,7 +9,7 @@ class Classifier(pl.LightningModule):
     def __init__(self, architecture, num_classes, lr=0.01):
         super().__init__()
 
-        self.save_hyperparameters()
+        self.save_hyperparameters(ignore=["architecture", "num_classes"])
 
         self.classifier = architecture
         self.num_classes = num_classes

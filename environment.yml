@@ -12,6 +12,7 @@ dependencies:
   - torchvision
   - torchaudio
   - pytorch-cuda=11.7
+  - lightning
   - torchmetrics
   - torchinfo
   - wandb
@@ -33,8 +34,8 @@ dependencies:
   - tensorboard
   - pip:
       - selectivesearch
-      - 'lightning[extra]'
       - gradient
       - 'black[jupyter]'
       - flake8
       - torch-tb-profiler
+      - click

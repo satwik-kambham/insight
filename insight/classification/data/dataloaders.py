@@ -2,7 +2,7 @@ import torch
 from torchvision import datasets, transforms
 
 
-def load_data(root, dataset, img_shape, train_batch_size, val_batch_size, num_workers):
+def load_data(root, dataset, img_shape):
     """Load the specified dataset and create the corresponding dataloaders
 
     Parameters
@@ -21,7 +21,7 @@ def load_data(root, dataset, img_shape, train_batch_size, val_batch_size, num_wo
 
     Returns
     -------
-    tuple(DataLoader, DataLoader, int, tuple(int, int), int)
+    tuple(torch.utils.data.Dataset, torch.utils.data.Dataset, int, tuple(int, int), int)
         train and validation dataloaders, number of classes, image shape and
         number of channels
 
@@ -58,23 +58,7 @@ def load_data(root, dataset, img_shape, train_batch_size, val_batch_size, num_wo
     else:
         raise ValueError(f"Dataset {dataset} not implemented")
 
-    # Creating the dataloaders
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=train_batch_size,
-        shuffle=True,
-        drop_last=True,
-        num_workers=num_workers,
-    )
-    val_loader = torch.utils.data.DataLoader(
-        val_dataset,
-        batch_size=val_batch_size,
-        shuffle=False,
-        drop_last=True,
-        num_workers=num_workers,
-    )
-
-    return train_loader, val_loader, num_classes, img_shape, num_channels
+    return train_dataset, val_dataset, num_classes, img_shape, num_channels
 
 
 def load_CIFAR10(root, img_shape):
