@@ -139,7 +139,7 @@ def train(
     )
     tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
-    lr_monitor = LearningRateMonitor(logging_interval="step", log_momentum=True)
+    lr_monitor = LearningRateMonitor(log_momentum=True)
 
     trainer = pl.Trainer(
         accelerator=accelerator,
@@ -148,7 +148,7 @@ def train(
         callbacks=[lr_monitor],
     )
 
-    trainer.fit(classifier, datamodule)
+    trainer.fit(classifier, datamodule=datamodule)
 
 
 if __name__ == "__main__":
