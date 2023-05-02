@@ -53,20 +53,29 @@ class Classifier(pl.LightningModule):
         self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
-        print(self.factor)
         optimizer = optim.Adam(
             self.parameters(), lr=self.lr, weight_decay=self.weight_decay
         )
-        lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+        lr_scheduler1 = optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
             factor=self.factor,
             patience=self.patience,
             threshold=self.threshold,
         )
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": {
-                "scheduler": lr_scheduler,
+        lr_scheduler2 = optim.lr_scheduler.OneCycleLR(
+            optimizer,
+            max_lr=self.lr,
+            epochs=self.trainer.max_epochs,
+            steps_per_epoch=self.trainer.num_training_batches,
+        )
+        return [optimizer], [
+            {
+                "scheduler": lr_scheduler1,
                 "monitor": "val_loss",
+                "interval": "epoch",
             },
-        }
+            {
+                "scheduler": lr_scheduler2,
+                "interval": "step",
+            },
+        ]

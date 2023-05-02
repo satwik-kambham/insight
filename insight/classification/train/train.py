@@ -3,6 +3,7 @@ import torch
 import lightning.pytorch as pl
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
+from lightning.pytorch.callbacks.lr_monitor import LearningRateMonitor
 from torchinfo import summary
 
 import click
@@ -138,10 +139,13 @@ def train(
     )
     tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
+    lr_monitor = LearningRateMonitor(logging_interval="step", log_momentum=True)
+
     trainer = pl.Trainer(
         accelerator=accelerator,
         max_epochs=epochs,
         logger=[wandb_logger, tensorboard_logger],
+        callbacks=[lr_monitor],
     )
 
     trainer.fit(classifier, datamodule)
