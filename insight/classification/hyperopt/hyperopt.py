@@ -1,14 +1,11 @@
 import torch
 
 import lightning.pytorch as pl
-from lightning.pytorch.callbacks import Callback
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
-from torchinfo import summary
 
-from ray import tune, air
-from ray.air import session
-from ray.tune.search.optuna import OptunaSearch
+import optuna
+from .optuna_integration import PyTorchLightningPruningCallback
 
 import click
 
@@ -57,16 +54,18 @@ params = {
 }
 
 
-class TuneReportCallback(Callback):
-    def on_validation_end(self, trainer, pl_module):
-        session.report({"val_acc": trainer.callback_metrics["val_acc"].item()})
+def objective(trial: optuna.trial.Trial):
+    train_batch_size = trial.suggest_categorical("train_batch_size", [8, 16, 32, 64])
+    lr = trial.suggest_float("lr", 1e-5, 1e-1, log=True)
+    weight_decay = trial.suggest_float("weight_decay", 1e-5, 1e-1, log=True)
+    factor = trial.suggest_float("factor", 0.1, 0.9)
+    patience = trial.suggest_int("patience", 1, 10)
+    threshold = trial.suggest_float("threshold", 1e-5, 1e-1, log=True)
 
-
-def objective(config):
     datamodule = DataModule(
         root=params["data_dir"],
         dataset=params["dataset"],
-        train_batch_size=config["train_batch_size"],
+        train_batch_size=train_batch_size,
         val_batch_size=params["val_batch_size"],
         num_workers=params["num_workers"],
     )
@@ -85,30 +84,28 @@ def objective(config):
     classifier = Classifier(
         model,
         datamodule.num_classes,
-        lr=config["lr"],
-        weight_decay=config["weight_decay"],
-        factor=config["factor"],
-        patience=config["patience"],
-        threshold=config["threshold"],
+        lr=lr,
+        weight_decay=weight_decay,
+        factor=factor,
+        patience=patience,
+        threshold=threshold,
     )
 
     # wandb_logger = WandbLogger(project="classifiers")
-    # wandb_logger.log_hyperparams(
-    #     {
-    #         "dataset": params["dataset"],
-    #         "architecture": params["architecture"],
-    #     }
-    # )
+    # wandb_logger.log_hyperparams(params)
     # tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
     trainer = pl.Trainer(
         accelerator=params["accelerator"],
+        max_epochs=params["epochs"],
         # logger=[wandb_logger, tensorboard_logger],
-        callbacks=[TuneReportCallback()],
-        enable_progress_bar=False,
+        callbacks=[PyTorchLightningPruningCallback(trial, monitor="val_loss")],
+        enable_progress_bar=True,
     )
 
     trainer.fit(classifier, datamodule)
+
+    return trainer.callback_metrics["val_loss"].item()
 
 
 @click.command()
@@ -162,36 +159,21 @@ def hyperopt(
     # Download dataset to data_dir
     load_data(params["data_dir"], params["dataset"], None)
 
-    search_space = {
-        "lr": tune.loguniform(1e-4, 1e-1),
-        "weight_decay": tune.loguniform(1e-4, 1e-1),
-        "factor": tune.uniform(0.1, 0.9),
-        "patience": tune.randint(1, 10),
-        "threshold": tune.loguniform(1e-4, 1e-2),
-        "train_batch_size": tune.choice([8, 16, 32, 64]),
-    }
+    pruner = optuna.pruners.MedianPruner()
 
-    algo = OptunaSearch()
+    study = optuna.create_study(direction="maximize", pruner=pruner)
+    study.optimize(objective)
 
-    tuner = tune.Tuner(
-        objective,
-        tune_config=tune.TuneConfig(
-            metric="val_acc",
-            mode="max",
-            search_alg=algo,
-        ),
-        run_config=air.RunConfig(
-            log_to_file=True,
-            stop={"training_iteration": params["epochs"]},
-        ),
-        param_space=search_space,
-    )
+    best_trial = study.best_trial
 
-    results = tuner.fit()
-    all_results = results.get_dataframe()
-    all_results.to_csv("tune_results.csv")
-    best_result = results.get_best_result()
-    print(best_result.config)
+    print("Best trial:")
+    print("  Value: ", best_trial.value)
+    print("  Params: ")
+    for key, value in best_trial.params.items():
+        print("    {}: {}".format(key, value))
+
+    all_trails = study.trials_dataframe()
+    all_trails.to_csv("trails.csv")
 
 
 if __name__ == "__main__":
