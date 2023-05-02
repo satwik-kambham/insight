@@ -74,8 +74,8 @@ class Classifier(pl.LightningModule):
                 "monitor": "val_loss",
                 "interval": "epoch",
             },
-            {
-                "scheduler": lr_scheduler2,
-                "interval": "step",
-            },
+            # {
+            #     "scheduler": lr_scheduler2,
+            #     "interval": "step",
+            # },
         ]
