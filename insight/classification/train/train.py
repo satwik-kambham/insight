@@ -11,36 +11,6 @@ import click
 from ..data.datamodule import DataModule
 from ..models.classifier import Classifier
 
-from ..models.LeNet import LeNet5
-from ..models.AlexNet import AlexNet
-from ..models.VGG import VGG_A, VGG_B, VGG_C, VGG_D, VGG_E, VGG
-from ..models.GoogLeNet import GoogLeNet
-from ..models.ResNet import (
-    RESNET_18,
-    RESNET_34,
-    RESNET_50,
-    RESNET_101,
-    RESNET_152,
-    ResNet,
-)
-
-
-model_dict = {
-    "LeNet5": (LeNet5,),
-    "AlexNet": (AlexNet,),
-    "VGG_A": (VGG, VGG_A),
-    "VGG_B": (VGG, VGG_B),
-    "VGG_C": (VGG, VGG_C),
-    "VGG_D": (VGG, VGG_D),
-    "VGG_E": (VGG, VGG_E),
-    "GoogLeNet": (GoogLeNet,),
-    "ResNet18": (ResNet, RESNET_18, "simple"),
-    "ResNet34": (ResNet, RESNET_34, "simple"),
-    "ResNet50": (ResNet, RESNET_50, "bottleneck"),
-    "ResNet101": (ResNet, RESNET_101, "bottleneck"),
-    "ResNet152": (ResNet, RESNET_152, "bottleneck"),
-}
-
 
 @click.command()
 @click.option("--data_dir", type=str, default="datasets", help="Path to data directory")
@@ -104,31 +74,23 @@ def train(
         num_workers=num_workers,
     )
 
-    model = model_dict[architecture][0](
-        *model_dict[architecture][1:], datamodule.num_classes
-    )
-
-    test_input_size = (1, datamodule.num_channels, *datamodule.img_shape)
-    test_input = torch.randn(test_input_size)
-    _ = model(test_input)
-
-    if hasattr(model, "_init_weights"):
-        model._init_weights()
-
-    summary(model, input_data=test_input)
-
-    if compile:
-        model = torch.compile(model)
-
     classifier = Classifier(
-        model,
-        datamodule.num_classes,
+        architecture=architecture,
+        num_classes=datamodule.num_classes,
+        num_channels=datamodule.num_channels,
+        img_shape=datamodule.img_shape,
         lr=lr,
         weight_decay=weight_decay,
         factor=factor,
         patience=patience,
         threshold=threshold,
+        compile=compile,
     )
+
+    test_input_size = (1, datamodule.num_channels, *datamodule.img_shape)
+    test_input = torch.randn(test_input_size)
+
+    summary(classifier, input_data=test_input)
 
     wandb_logger = WandbLogger(project="classifiers")
     wandb_logger.log_hyperparams(

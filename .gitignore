@@ -12,3 +12,6 @@ lightning_logs/
 
 # wand
 wandb
+
+# Checkpoints
+checkpoints
