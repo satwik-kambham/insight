@@ -32,6 +32,8 @@ dependencies:
   - wandb
   - datasets
   - tensorboard
+  - gradio
+  - streamlit
   - pip:
       - selectivesearch
       - gradient

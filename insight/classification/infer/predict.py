@@ -1,44 +1,40 @@
 import click
 
+from PIL import Image
+
 from ..models.classifier import Classifier
 
-from ..models.LeNet import LeNet5
-from ..models.AlexNet import AlexNet
-from ..models.VGG import VGG_A, VGG_B, VGG_C, VGG_D, VGG_E, VGG
-from ..models.GoogLeNet import GoogLeNet
-from ..models.ResNet import (
-    RESNET_18,
-    RESNET_34,
-    RESNET_50,
-    RESNET_101,
-    RESNET_152,
-    ResNet,
-)
-
-
-model_dict = {
-    "LeNet5": (LeNet5,),
-    "AlexNet": (AlexNet,),
-    "VGG_A": (VGG, VGG_A),
-    "VGG_B": (VGG, VGG_B),
-    "VGG_C": (VGG, VGG_C),
-    "VGG_D": (VGG, VGG_D),
-    "VGG_E": (VGG, VGG_E),
-    "GoogLeNet": (GoogLeNet,),
-    "ResNet18": (ResNet, RESNET_18, "simple"),
-    "ResNet34": (ResNet, RESNET_34, "simple"),
-    "ResNet50": (ResNet, RESNET_50, "bottleneck"),
-    "ResNet101": (ResNet, RESNET_101, "bottleneck"),
-    "ResNet152": (ResNet, RESNET_152, "bottleneck"),
-}
+from .preprocess import preprocess_image
 
 
 @click.command()
 @click.option("--ckpt_file", type=str, help="Path to checkpoint file")
-def infer(ckpt_file):
+@click.option("--img", type=str, help="Path to image")
+def infer(ckpt_file, img):
     classifier = Classifier.load_from_checkpoint(
         checkpoint_path=ckpt_file,
     )
+    classifier = classifier.cpu()
+
+    print(classifier.hparams)
+
+    img = Image.open(img)
+    img = preprocess_image(img, classifier.hparams.img_shape)
+
+    classifier.eval()
+    classifier.freeze()
+
+    logits = classifier(img.unsqueeze(0))
+    print(logits)
+
+    probs = logits.softmax(dim=1)
+    print(probs)
+
+    # Print category along with probability ordered from highest to lowest
+    for i, (prob, label) in enumerate(
+        sorted(zip(probs.squeeze().tolist(), classifier.labels), reverse=True)
+    ):
+        print(f"{i + 1}. {label}: {prob * 100:.2f}%")
 
 
 if __name__ == "__main__":
