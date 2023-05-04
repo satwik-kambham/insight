@@ -43,6 +43,7 @@ def objective(trial: optuna.trial.Trial):
         num_classes=datamodule.num_classes,
         num_channels=datamodule.num_channels,
         img_shape=datamodule.img_shape,
+        labels=datamodule.labels,
         lr=lr,
         weight_decay=weight_decay,
         factor=factor,

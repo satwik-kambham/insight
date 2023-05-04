@@ -44,6 +44,7 @@ class Classifier(pl.LightningModule):
         num_classes,
         num_channels,
         img_shape,
+        labels,
         lr=0.01,
         weight_decay=0.0,
         factor=0.1,
@@ -74,6 +75,9 @@ class Classifier(pl.LightningModule):
 
         self.classifier = model
         self.num_classes = num_classes
+        self.num_channels = num_channels
+        self.img_shape = img_shape
+        self.labels = labels
 
         self.lr = lr
         self.weight_decay = weight_decay

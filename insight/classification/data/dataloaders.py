@@ -35,22 +35,24 @@ def load_data(root, dataset, img_shape):
 
     # Loading the dataset
     if dataset == "CIFAR10":
-        train_dataset, val_dataset, img_shape = load_CIFAR10(root, img_shape)
+        train_dataset, val_dataset, img_shape, labels = load_CIFAR10(root, img_shape)
         num_classes = 10
     elif dataset == "Caltech256":
-        train_dataset, val_dataset, img_shape = load_Caltech256(root, img_shape)
+        train_dataset, val_dataset, img_shape, labels = load_Caltech256(root, img_shape)
         num_classes = 257
     elif dataset == "Caltech101":
-        train_dataset, val_dataset, img_shape = load_Caltech101(root, img_shape)
+        train_dataset, val_dataset, img_shape, labels = load_Caltech101(root, img_shape)
         num_classes = 101
     elif dataset == "fashion_MNIST":
-        train_dataset, val_dataset, img_shape = load_fashion_MNIST(root, img_shape)
+        train_dataset, val_dataset, img_shape, labels = load_fashion_MNIST(
+            root, img_shape
+        )
         num_classes = 10
         num_channels = 1
     else:
         raise ValueError(f"Dataset {dataset} not implemented")
 
-    return train_dataset, val_dataset, num_classes, img_shape, num_channels
+    return train_dataset, val_dataset, num_classes, img_shape, num_channels, labels
 
 
 img_augmentation = transforms.Compose(
@@ -89,7 +91,9 @@ def load_CIFAR10(root, img_shape):
         download=True,
     )
 
-    return train_dataset, val_dataset, img_shape
+    labels = train_dataset.classes
+
+    return train_dataset, val_dataset, img_shape, labels
 
 
 def load_Caltech256(root, img_shape):
@@ -116,7 +120,9 @@ def load_Caltech256(root, img_shape):
     # Splitting the dataset into train and validation
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
 
-    return train_dataset, val_dataset, img_shape
+    labels = dataset.categories
+
+    return train_dataset, val_dataset, img_shape, labels
 
 
 def load_Caltech101(root, img_shape):
@@ -143,7 +149,9 @@ def load_Caltech101(root, img_shape):
     # Splitting the dataset into train and validation
     train_dataset, val_dataset = torch.utils.data.random_split(dataset, [0.7, 0.3])
 
-    return train_dataset, val_dataset, img_shape
+    labels = dataset.categories
+
+    return train_dataset, val_dataset, img_shape, labels
 
 
 def load_fashion_MNIST(root, img_shape):
@@ -175,4 +183,6 @@ def load_fashion_MNIST(root, img_shape):
         download=True,
     )
 
-    return train_dataset, val_dataset, img_shape
+    labels = train_dataset.classes
+
+    return train_dataset, val_dataset, img_shape, labels

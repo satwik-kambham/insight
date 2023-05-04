@@ -28,6 +28,7 @@ class DataModule(pl.LightningDataModule):
             self.num_classes,
             self.img_shape,
             self.num_channels,
+            self.labels,
         ) = load_data(self.root, self.dataset, self.img_shape)
 
         self.save_hyperparameters(ignore=["img_shape"])
