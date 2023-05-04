@@ -1,10 +1,7 @@
-import torch
-
 import lightning.pytorch as pl
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks.lr_monitor import LearningRateMonitor
-from torchinfo import summary
 
 import click
 
@@ -66,6 +63,8 @@ def train(
     accelerator,
     compile,
 ):
+    pl.seed_everything(42, workers=True)
+
     datamodule = DataModule(
         root=data_dir,
         dataset=dataset,
@@ -86,11 +85,6 @@ def train(
         threshold=threshold,
         compile=compile,
     )
-
-    test_input_size = (1, datamodule.num_channels, *datamodule.img_shape)
-    test_input = torch.randn(test_input_size)
-
-    summary(classifier, input_data=test_input)
 
     wandb_logger = WandbLogger(project="classifiers")
     wandb_logger.log_hyperparams(

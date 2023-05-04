@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from torchinfo import summary
 import lightning.pytorch as pl
 import torchmetrics as tm
 
@@ -65,6 +66,8 @@ class Classifier(pl.LightningModule):
 
         if hasattr(model, "_init_weights"):
             model._init_weights()
+
+        summary(model, input_data=test_input)
 
         if compile:
             model = torch.compile(model)
