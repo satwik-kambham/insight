@@ -67,3 +67,12 @@ class GoogLeNet(nn.Module):
         out = self.dropout(out)
         out = self.fc(out)
         return out
+
+    def _init_weights(module):
+        # Initlize weights with glorot uniform
+        if isinstance(module, nn.Conv2d):
+            nn.init.xavier_uniform_(module.weight)
+            nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Linear):
+            nn.init.xavier_uniform_(module.weight)
+            nn.init.zeros_(module.bias)
