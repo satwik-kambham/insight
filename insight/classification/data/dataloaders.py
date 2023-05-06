@@ -57,7 +57,9 @@ def load_data(root, dataset, img_shape):
 
 img_augmentation = transforms.Compose(
     [
-        transforms.AutoAugment(transforms.AutoAugmentPolicy.IMAGENET),
+        transforms.RandomRotation(360),
+        transforms.RandomPerspective(),
+        transforms.RandomHorizontalFlip(),
     ]
 )
 
@@ -72,6 +74,7 @@ def load_CIFAR10(root, img_shape):
             img_augmentation,
             transforms.Resize(img_shape),
             transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
         ]
     )
     label_transform = transforms.Compose([])
