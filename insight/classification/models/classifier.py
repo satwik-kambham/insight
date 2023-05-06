@@ -113,26 +113,26 @@ class Classifier(pl.LightningModule):
         optimizer = optim.Adam(
             self.parameters(), lr=self.lr, weight_decay=self.weight_decay
         )
-        lr_scheduler1 = optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer,
-            factor=self.factor,
-            patience=self.patience,
-            threshold=self.threshold,
-        )
-        # lr_scheduler2 = optim.lr_scheduler.OneCycleLR(
+        # lr_scheduler1 = optim.lr_scheduler.ReduceLROnPlateau(
         #     optimizer,
-        #     max_lr=self.lr,
-        #     epochs=self.trainer.max_epochs,
-        #     steps_per_epoch=len(self.trainer.datamodule.train_dataloader()),
+        #     factor=self.factor,
+        #     patience=self.patience,
+        #     threshold=self.threshold,
         # )
+        lr_scheduler2 = optim.lr_scheduler.OneCycleLR(
+            optimizer,
+            max_lr=self.lr,
+            epochs=self.trainer.max_epochs,
+            steps_per_epoch=len(self.trainer.datamodule.train_dataloader()),
+        )
         return [optimizer], [
-            {
-                "scheduler": lr_scheduler1,
-                "monitor": "val_loss",
-                "interval": "epoch",
-            },
             # {
-            #     "scheduler": lr_scheduler2,
-            #     "interval": "step",
+            #     "scheduler": lr_scheduler1,
+            #     "monitor": "val_loss",
+            #     "interval": "epoch",
             # },
+            {
+                "scheduler": lr_scheduler2,
+                "interval": "step",
+            },
         ]
