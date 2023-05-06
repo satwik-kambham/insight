@@ -66,6 +66,7 @@ class Classifier(pl.LightningModule):
         _ = model(test_input)
 
         if hasattr(model, "_init_weights"):
+            print("Initializing weights")
             model._init_weights()
 
         summary(model, input_data=test_input)

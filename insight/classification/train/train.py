@@ -1,7 +1,8 @@
 import lightning.pytorch as pl
+from lightning.pytorch.tuner import Tuner
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
-from lightning.pytorch.callbacks.lr_monitor import LearningRateMonitor
+from lightning.pytorch.callbacks import LearningRateMonitor, StochasticWeightAveraging
 
 import click
 
@@ -47,6 +48,7 @@ from ..models.classifier import Classifier
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
 )
 @click.option("--compile", type=bool, default=False, help="Compile model")
+@click.option("--find_lr", type=bool, default=False, help="Find learning rate")
 def train(
     data_dir,
     dataset,
@@ -62,6 +64,7 @@ def train(
     epochs,
     accelerator,
     compile,
+    find_lr,
 ):
     pl.seed_everything(42, workers=True)
 
@@ -97,13 +100,25 @@ def train(
     tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
     lr_monitor = LearningRateMonitor(log_momentum=True)
+    swa = StochasticWeightAveraging(swa_lrs=1e-2)
 
     trainer = pl.Trainer(
         accelerator=accelerator,
         max_epochs=epochs,
+        gradient_clip_val=1.0,
         logger=[wandb_logger, tensorboard_logger],
-        callbacks=[lr_monitor],
+        callbacks=[lr_monitor, swa],
     )
+
+    if find_lr:
+        tuner = Tuner(trainer)
+        lr_finder = tuner.lr_find(
+            classifier,
+            datamodule=datamodule,
+            update_attr=False,
+        )
+        print(lr_finder.results)
+        print(lr_finder.suggestion())
 
     trainer.fit(classifier, datamodule=datamodule)
 
