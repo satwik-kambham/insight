@@ -66,7 +66,7 @@ img_augmentation = transforms.Compose(
 
 def load_CIFAR10(root, img_shape):
     if img_shape is None:
-        img_shape = (244, 244)
+        img_shape = (32, 32)
 
     # Loading the dataset
     img_transform = transforms.Compose(
@@ -159,7 +159,7 @@ def load_Caltech101(root, img_shape):
 
 def load_fashion_MNIST(root, img_shape):
     if img_shape is None:
-        img_shape = (244, 244)
+        img_shape = (28, 28)
 
     # Loading the dataset
     img_transform = transforms.Compose(

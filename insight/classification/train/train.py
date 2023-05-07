@@ -37,12 +37,10 @@ from ..models.classifier import Classifier
 )
 @click.option("--train_batch_size", type=int, default=64, help="Training batch size")
 @click.option("--val_batch_size", type=int, default=64, help="Validation batch size")
+@click.option("--img_shape", type=int, default=None, help="Image shape")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
 @click.option("--lr", type=float, default=0.001, help="Learning rate")
 @click.option("--weight_decay", type=float, default=0.0, help="Weight decay")
-@click.option("--factor", type=float, default=0.1, help="Factor")
-@click.option("--patience", type=int, default=3, help="Patience")
-@click.option("--threshold", type=float, default=0.0001, help="Threshold")
 @click.option("--epochs", type=int, default=20, help="Number of epochs")
 @click.option(
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
@@ -55,12 +53,10 @@ def train(
     architecture,
     train_batch_size,
     val_batch_size,
+    img_shape,
     num_workers,
     lr,
     weight_decay,
-    factor,
-    patience,
-    threshold,
     epochs,
     accelerator,
     compile,
@@ -71,6 +67,7 @@ def train(
     datamodule = DataModule(
         root=data_dir,
         dataset=dataset,
+        img_shape=(img_shape, img_shape),
         train_batch_size=train_batch_size,
         val_batch_size=val_batch_size,
         num_workers=num_workers,
@@ -84,9 +81,6 @@ def train(
         labels=datamodule.labels,
         lr=lr,
         weight_decay=weight_decay,
-        factor=factor,
-        patience=patience,
-        threshold=threshold,
         compile=compile,
     )
 
