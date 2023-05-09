@@ -46,6 +46,7 @@ class Classifier(pl.LightningModule):
         img_shape,
         labels,
         lr=0.01,
+        momentum=0.9,
         weight_decay=0.0,
         compile=False,
     ):
@@ -78,6 +79,7 @@ class Classifier(pl.LightningModule):
         self.labels = labels
 
         self.lr = lr
+        self.momentum = momentum
         self.weight_decay = weight_decay
 
         self.criterion = nn.CrossEntropyLoss()
@@ -104,18 +106,20 @@ class Classifier(pl.LightningModule):
         self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(
-            self.parameters(), lr=self.lr, weight_decay=self.weight_decay
+        optimizer = optim.SGD(
+            self.parameters(),
+            lr=self.lr,
+            momentum=self.momentum,
+            weight_decay=self.weight_decay,
         )
-        lr_scheduler = optim.lr_scheduler.OneCycleLR(
+        lr_scheduler = optim.lr_scheduler.StepLR(
             optimizer,
-            max_lr=self.lr,
-            epochs=self.trainer.max_epochs,
-            steps_per_epoch=len(self.trainer.datamodule.train_dataloader()),
+            step_size=30,
+            gamma=0.1,
         )
         return [optimizer], [
             {
                 "scheduler": lr_scheduler,
-                "interval": "step",
+                "interval": "epoch",
             },
         ]

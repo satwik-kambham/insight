@@ -57,8 +57,6 @@ def load_data(root, dataset, img_shape):
 
 img_augmentation = transforms.Compose(
     [
-        transforms.RandomRotation(360),
-        transforms.RandomPerspective(),
         transforms.RandomHorizontalFlip(),
     ]
 )
