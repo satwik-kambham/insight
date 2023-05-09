@@ -31,9 +31,12 @@ dependencies:
   - ipywidgets
   - wandb
   - datasets
+  - transformers
   - tensorboard
   - gradio
   - streamlit
+  - onnx
+  - onnxruntime
   - pip:
       - selectivesearch
       - gradient

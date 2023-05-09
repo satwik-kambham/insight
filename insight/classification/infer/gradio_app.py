@@ -45,6 +45,7 @@ class ImageClassifier:
 
 def classify(input_image, checkpoint_file):
     classifier = ImageClassifier(checkpoint_file.name)
+    print("Categories:", classifier.model.labels)
     return classifier.classify(input_image, checkpoint_file)
 
 
