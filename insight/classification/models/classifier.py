@@ -112,14 +112,15 @@ class Classifier(pl.LightningModule):
             momentum=self.momentum,
             weight_decay=self.weight_decay,
         )
-        lr_scheduler = optim.lr_scheduler.StepLR(
+        lr_scheduler = optim.lr_scheduler.OneCycleLR(
             optimizer,
-            step_size=30,
-            gamma=0.1,
+            max_lr=self.lr,
+            epochs=self.trainer.max_epochs,
+            steps_per_epoch=len(self.trainer.datamodule.train_dataloader()),
         )
         return [optimizer], [
             {
                 "scheduler": lr_scheduler,
-                "interval": "epoch",
+                "interval": "step",
             },
         ]
