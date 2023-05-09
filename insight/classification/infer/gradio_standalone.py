@@ -2,9 +2,8 @@ import gradio as gr
 from huggingface_hub import hf_hub_download
 
 import torch
-from torchvision import transforms
-
 import torch.nn as nn
+from torchvision import transforms
 
 
 class SimpleResidualBlock(nn.Module):
