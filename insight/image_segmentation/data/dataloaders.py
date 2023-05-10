@@ -2,8 +2,18 @@ from torchvision import datasets, transforms
 
 
 def load_VOCSegmentation(data_dir):
-    img_transforms = transforms.Compose([])
-    mask_transforms = transforms.Compose([])
+    img_transforms = transforms.Compose(
+        [
+            transforms.Resize((572, 572)),
+            transforms.ToTensor(),
+        ]
+    )
+    mask_transforms = transforms.Compose(
+        [
+            transforms.Resize((388, 388)),
+            transforms.ToTensor(),
+        ]
+    )
 
     train_dataset = datasets.VOCSegmentation(
         root=data_dir,
