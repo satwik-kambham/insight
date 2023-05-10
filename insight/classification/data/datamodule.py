@@ -13,7 +13,7 @@ class DataModule(pl.LightningDataModule):
         img_shape=None,
         train_batch_size=32,
         val_batch_size=32,
-        num_workers=4,
+        num_workers=0,
     ):
         super().__init__()
         self.root = root
