@@ -10,7 +10,7 @@ class VOCSegmentationDataModule(pl.LightningDataModule):
     def __init__(
         self,
         data_dir,
-        batch_size=16,
+        batch_size=1,
         num_workers=0,
     ):
         super().__init__()
