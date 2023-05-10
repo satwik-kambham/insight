@@ -27,3 +27,6 @@ RUN rm -f environment.yml
 
 # Activate insight environment
 RUN echo "conda activate insight" >> ~/.bashrc
+
+# Set bash as default shell
+SHELL ["/bin/bash", "-c"]

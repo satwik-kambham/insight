@@ -126,7 +126,7 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        pred = output.argmax(dim=1, keepdim=False)
+        pred = output.argmax(dim=1, keepdim=True)
         self.log("val_loss", loss)
         self.iou(pred, target)
         self.log("val_iou", self.iou, on_step=False, on_epoch=True)
