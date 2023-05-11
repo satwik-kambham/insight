@@ -25,6 +25,14 @@ RUN ~/mambaforge/condabin/conda init
 RUN ~/mambaforge/condabin/mamba env create --file environment.yml
 RUN rm -f environment.yml
 
+# Get latest version of insight from github
+WORKDIR /notebooks
+RUN git clone https://github.com/code-explorer/insight.git
+
+# Install package using setuptools in editable mode
+WORKDIR /notebooks/insight
+RUN $env_bin/pip install -e .
+
 # Activate insight environment
 RUN echo "conda activate insight" >> ~/.bashrc
 

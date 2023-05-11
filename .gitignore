@@ -15,3 +15,5 @@ wandb
 
 # Checkpoints
 checkpoints
+
+insight.egg-info
