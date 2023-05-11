@@ -1,5 +1,4 @@
 from torch.utils.data import DataLoader
-from torchvision import datasets
 
 import lightning.pytorch as pl
 
@@ -20,13 +19,6 @@ class VOCSegmentationDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
 
         self.save_hyperparameters()
-
-    def prepare_data(self):
-        datasets.VOCSegmentation(
-            root=self.data_dir,
-            image_set="trainval",
-            download=True,
-        )
 
     def setup(self, stage):
         self.train_dataset, self.val_dataset = load_VOCSegmentation(self.data_dir)
