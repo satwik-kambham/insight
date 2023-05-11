@@ -40,7 +40,7 @@ def train(
         num_workers=num_workers,
     )
 
-    model = UNet(1)
+    model = UNet(21)
 
     if compile:
         model = model.compile()

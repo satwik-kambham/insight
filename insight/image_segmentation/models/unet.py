@@ -107,6 +107,7 @@ class UNetModule(pl.LightningModule):
         self.lr = lr
         self.momentum = momentum
         self.weight_decay = weight_decay
+        self.num_classes = num_classes
 
         self.criterion = nn.CrossEntropyLoss()
 
@@ -126,9 +127,9 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        pred = output.argmax(dim=1, keepdim=True)
+        pred = output.argmax(dim=1, keepdim=False)
         self.log("val_loss", loss)
-        self.iou(pred, target)
+        self.iou(pred.float(), target)
         self.log("val_iou", self.iou, on_step=False, on_epoch=True)
 
     def configure_optimizers(self):

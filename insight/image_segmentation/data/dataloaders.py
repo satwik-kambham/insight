@@ -13,6 +13,7 @@ def load_VOCSegmentation(data_dir):
 
     def mask_to_tensor(mask):
         mask = np.array(mask)
+        mask[mask == 255] = 0
         tensor_mask = torch.from_numpy(mask).long()
         return tensor_mask
 
