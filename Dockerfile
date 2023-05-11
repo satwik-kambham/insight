@@ -15,7 +15,7 @@ RUN bash Mambaforge-Linux-x86_64.sh -b
 RUN rm -f Mambaforge-Linux-x86_64.sh
 
 # Copy over environment yml specification
-WORKDIR /insight
+WORKDIR /insight_dev
 COPY environment.yml .
 
 # Create and activate new environment from yml specification
@@ -26,11 +26,10 @@ RUN ~/mambaforge/condabin/mamba env create --file environment.yml
 RUN rm -f environment.yml
 
 # Get latest version of insight from github
-WORKDIR /notebooks
 RUN git clone https://github.com/code-explorer/insight.git
 
 # Install package using setuptools in editable mode
-WORKDIR /notebooks/insight
+WORKDIR /insight_dev/insight
 RUN $env_bin/pip install -e .
 
 # Activate insight environment
