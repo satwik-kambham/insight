@@ -1,7 +1,11 @@
+import torch
+
 import lightning.pytorch as pl
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import LearningRateMonitor
+
+from torchinfo import summary
 
 import click
 
@@ -41,6 +45,12 @@ def train(
     )
 
     model = UNet(21)
+
+    test_input_shape = (1, 3, 572, 572)
+    test_input = torch.randn(test_input_shape)
+    _ = model(test_input)
+
+    summary(model, input_size=test_input_shape)
 
     if compile:
         model = model.compile()
