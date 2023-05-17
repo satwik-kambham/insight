@@ -5,7 +5,7 @@ from PIL import Image
 
 
 def generate_mask_from_class_probabilities(pred, num_classes):
-    pred_labels = pred.argmax(dim=1, keepdim=False).numpy()
+    pred_labels = pred.argmax(dim=1, keepdim=False).cpu().numpy()
 
     # Create color map given number of classes
     color_map = matplotlib.colormaps.get_cmap("hsv")
