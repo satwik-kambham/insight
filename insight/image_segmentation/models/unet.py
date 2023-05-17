@@ -1,9 +1,14 @@
+import numpy as np
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
 import lightning.pytorch as pl
+from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 import torchmetrics as tm
+
+from ..utils import mask
 
 
 class UNet(nn.Module):
@@ -128,9 +133,26 @@ class UNetModule(pl.LightningModule):
         output = self(data)
         loss = self.criterion(output, target)
         pred = output.argmax(dim=1, keepdim=False)
+        self.val_pred = output
         self.log("val_loss", loss)
         self.iou(pred.float(), target)
         self.log("val_iou", self.iou, on_step=False, on_epoch=True)
+
+    def on_validation_epoch_end(self):
+        mask_image = mask.generate_mask_from_class_probabilities(
+            self.val_pred, self.num_classes
+        )
+
+        for logger in self.loggers:
+            if isinstance(logger, TensorBoardLogger):
+                np_mask_image = np.array(mask_image.convert("RGB"))
+                np_mask_image = np_mask_image.transpose(2, 0, 1)
+                logger.experiment.add_image(
+                    "val_mask", np_mask_image, global_step=self.current_epoch
+                )
+
+            if isinstance(logger, WandbLogger):
+                logger.log_image(key="val_mask", images=[mask_image])
 
     def configure_optimizers(self):
         optimizer = optim.SGD(
