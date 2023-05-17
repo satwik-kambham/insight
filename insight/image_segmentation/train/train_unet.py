@@ -18,8 +18,8 @@ from ..models.unet import UNet, UNetModule
 @click.option("--batch_size", type=int, default=1, help="Batch size")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
 @click.option("--lr", type=float, default=0.01, help="Learning rate")
-@click.option("--momentum", type=float, default=0.9, help="Momentum")
-@click.option("--weight_decay", type=float, default=0.0, help="Weight decay")
+@click.option("--momentum", type=float, default=0.99, help="Momentum")
+@click.option("--weight_decay", type=float, default=0.0005, help="Weight decay")
 @click.option("--epochs", type=int, default=20, help="Number of epochs")
 @click.option(
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"

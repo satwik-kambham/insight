@@ -93,7 +93,7 @@ class UNetModule(pl.LightningModule):
     def __init__(
         self,
         model,
-        lr=0.1,
+        lr=0.01,
         momentum=0.99,
         weight_decay=0.0005,
         num_classes=21,
