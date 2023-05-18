@@ -114,7 +114,7 @@ class UNetModule(pl.LightningModule):
         self.weight_decay = weight_decay
         self.num_classes = num_classes
 
-        self.criterion = nn.CrossEntropyLoss(ignore_index=255)
+        self.criterion = nn.CrossEntropyLoss(ignore_index=0)
 
         self.iou = tm.JaccardIndex(task="multiclass", num_classes=num_classes)
 
