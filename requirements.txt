@@ -4,18 +4,13 @@ torchmetrics
 torchinfo
 wandb
 scipy
-ray-tune
+ray[tune]
 optuna
-cuda-nvcc
 numpy
 pandas
 matplotlib
 bokeh
 seaborn
-jupyter
-jupyterlab
-ipython
-ipywidgets
 wandb
 datasets
 transformers
@@ -26,7 +21,4 @@ onnx
 onnxruntime
 selectivesearch
 gradient
-black
-flake8
-torch-tb-profiler
 click
