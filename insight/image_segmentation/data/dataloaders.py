@@ -14,7 +14,7 @@ def load_VOCSegmentation(data_dir):
     def mask_to_tensor(mask):
         mask = np.array(mask)
         mask = mask == 0
-        tensor_mask = torch.from_numpy(mask).long()
+        tensor_mask = torch.from_numpy(mask).float()
         tensor_mask = torch.nn.functional.one_hot(tensor_mask, num_classes=2).permute(
             2, 0, 1
         )
