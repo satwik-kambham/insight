@@ -44,7 +44,7 @@ def train(
         num_workers=num_workers,
     )
 
-    model = UNet(21)
+    model = UNet(2)
 
     test_input_shape = (1, 3, 572, 572)
     test_input = torch.randn(test_input_shape)
@@ -57,7 +57,7 @@ def train(
 
     unet_module = UNetModule(
         model=model,
-        num_classes=21,
+        num_classes=2,
         lr=lr,
         momentum=momentum,
         weight_decay=weight_decay,
