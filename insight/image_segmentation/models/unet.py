@@ -164,15 +164,16 @@ class UNetModule(pl.LightningModule):
             momentum=self.momentum,
             weight_decay=self.weight_decay,
         )
-        lr_scheduler = optim.lr_scheduler.OneCycleLR(
-            optimizer,
-            max_lr=self.lr,
-            epochs=self.trainer.max_epochs,
-            steps_per_epoch=len(self.trainer.datamodule.train_dataloader()),
-        )
-        return [optimizer], [
-            {
-                "scheduler": lr_scheduler,
-                "interval": "step",
-            },
-        ]
+        # lr_scheduler = optim.lr_scheduler.OneCycleLR(
+        #     optimizer,
+        #     max_lr=self.lr,
+        #     epochs=self.trainer.max_epochs,
+        #     steps_per_epoch=len(self.trainer.datamodule.train_dataloader()),
+        # )
+        # return [optimizer], [
+        #     {
+        #         "scheduler": lr_scheduler,
+        #         "interval": "step",
+        #     },
+        # ]
+        return optimizer
