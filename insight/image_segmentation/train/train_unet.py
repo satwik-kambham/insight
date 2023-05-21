@@ -13,18 +13,6 @@ from ..data.datamodule import VOCSegmentationDataModule
 from ..models.unet import UNet, UNetModule
 
 
-@click.command()
-@click.option("--data_dir", type=str, default="datasets", help="Path to data directory")
-@click.option("--batch_size", type=int, default=1, help="Batch size")
-@click.option("--num_workers", type=int, default=4, help="Number of workers")
-@click.option("--lr", type=float, default=0.01, help="Learning rate")
-@click.option("--momentum", type=float, default=0.99, help="Momentum")
-@click.option("--weight_decay", type=float, default=0.0005, help="Weight decay")
-@click.option("--epochs", type=int, default=20, help="Number of epochs")
-@click.option(
-    "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
-)
-@click.option("--compile", type=bool, default=False, help="Compile model")
 def train(
     data_dir,
     batch_size,
@@ -78,5 +66,41 @@ def train(
     trainer.fit(unet_module, datamodule=datamodule)
 
 
+@click.command()
+@click.option("--data_dir", type=str, default="datasets", help="Path to data directory")
+@click.option("--batch_size", type=int, default=1, help="Batch size")
+@click.option("--num_workers", type=int, default=4, help="Number of workers")
+@click.option("--lr", type=float, default=0.01, help="Learning rate")
+@click.option("--momentum", type=float, default=0.99, help="Momentum")
+@click.option("--weight_decay", type=float, default=0.0005, help="Weight decay")
+@click.option("--epochs", type=int, default=20, help="Number of epochs")
+@click.option(
+    "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
+)
+@click.option("--compile", type=bool, default=False, help="Compile model")
+def train_cli(
+    data_dir,
+    batch_size,
+    num_workers,
+    lr,
+    momentum,
+    weight_decay,
+    epochs,
+    accelerator,
+    compile,
+):
+    train(
+        data_dir,
+        batch_size,
+        num_workers,
+        lr,
+        momentum,
+        weight_decay,
+        epochs,
+        accelerator,
+        compile,
+    )
+
+
 if __name__ == "__main__":
-    train()
+    train_cli()
