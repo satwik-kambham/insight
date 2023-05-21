@@ -135,10 +135,10 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        pred = output.argmax(dim=1, keepdim=False)
+        # pred = output.argmax(dim=1, keepdim=False)
         self.val_pred = output
         self.log("val_loss", loss)
-        self.iou(pred.float(), target)
+        # self.iou(pred.float(), target)
         self.log("val_iou", self.iou, on_step=False, on_epoch=True)
 
     def on_validation_epoch_end(self):
