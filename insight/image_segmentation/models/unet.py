@@ -94,6 +94,7 @@ class UNetModule(pl.LightningModule):
         self.criterion = nn.CrossEntropyLoss()
 
         self.accuracy = tm.Accuracy(task="multiclass", num_classes=num_classes)
+        self.iou = tm.JaccardIndex(task="multiclass", num_classes=num_classes)
 
     def forward(self, x):
         return self.model(x)
@@ -109,12 +110,17 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
+        self.log("val_loss", loss)
+
         self.val_pred = output
         self.val_target = target
-        self.log("val_loss", loss)
+
         pred = output.argmax(dim=1, keepdim=False)
         self.accuracy(pred, target)
         self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
+
+        self.iou(pred, target)
+        self.log("val_iou", self.iou, on_step=False, on_epoch=True)
 
     def on_validation_epoch_end(self):
         mask_image = generate_mask(self.val_pred, self.num_classes + 1)
