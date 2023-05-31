@@ -7,6 +7,7 @@ import torch.optim as optim
 import lightning.pytorch as pl
 from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 import torchmetrics as tm
+from torchinfo import summary
 
 from ..utils.mask import generate_mask
 
@@ -67,15 +68,25 @@ class UNet(nn.Module):
 class UNetModule(pl.LightningModule):
     def __init__(
         self,
-        model,
+        inp_size,
+        num_classes=3,
         lr=0.01,
-        num_classes=2,
+        compile=False,
     ):
         super().__init__()
 
-        self.save_hyperparameters(ignore="model")
+        self.save_hyperparameters()
 
-        self.model = model
+        model = UNet(num_classes)
+
+        test_input_shape = (1, 3, inp_size, inp_size)
+        test_input = torch.randn(test_input_shape)
+        _ = model(test_input)
+
+        summary(model, input_size=test_input_shape)
+
+        if compile:
+            model = model.compile()
 
         self.lr = lr
         self.num_classes = num_classes

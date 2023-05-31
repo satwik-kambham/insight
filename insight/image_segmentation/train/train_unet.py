@@ -1,16 +1,12 @@
-import torch
-
 import lightning.pytorch as pl
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import LearningRateMonitor
 
-from torchinfo import summary
-
 import click
 
 from ..data.datamodule import SegmentationDataModule
-from ..models.unet import UNet, UNetModule
+from ..models.unet import UNetModule
 
 
 def train(
@@ -39,21 +35,11 @@ def train(
     elif dataset == "VOCSegmentation":
         NUM_CLASSES = 22
 
-    model = UNet(NUM_CLASSES)
-
-    test_input_shape = (1, 3, inp_size, inp_size)
-    test_input = torch.randn(test_input_shape)
-    _ = model(test_input)
-
-    summary(model, input_size=test_input_shape)
-
-    if compile:
-        model = model.compile()
-
     unet_module = UNetModule(
-        model=model,
         num_classes=NUM_CLASSES,
+        inp_size=inp_size,
         lr=lr,
+        compile=compile,
     )
 
     wandb_logger = WandbLogger(project="semantic_segmentation")
