@@ -26,12 +26,12 @@ class SegmentationDataModule(pl.LightningDataModule):
 
     def setup(self, stage):
         if self.dataset_name == "OxfordIIITPet":
-            self.train_dataset, self.val_dataset = load_OxfordIIITPetDataset(
+            self.train_dataset, self.val_dataset, _ = load_OxfordIIITPetDataset(
                 self.data_dir,
                 (self.inp_size, self.inp_size),
             )
         elif self.dataset_name == "VOCSegmentation":
-            self.train_dataset, self.val_dataset = load_VOCSegmentationDataset(
+            self.train_dataset, self.val_dataset, _ = load_VOCSegmentationDataset(
                 self.data_dir,
                 (self.inp_size, self.inp_size),
             )
