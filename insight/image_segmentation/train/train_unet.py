@@ -106,8 +106,6 @@ def train_cli(
         batch_size,
         num_workers,
         lr,
-        momentum,
-        weight_decay,
         epochs,
         accelerator,
         compile,
