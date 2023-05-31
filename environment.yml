@@ -38,6 +38,9 @@ dependencies:
   - streamlit
   - onnx
   - onnxruntime
+  - opencv
+  - imgaug
+  - albumentations
   - pip:
       - selectivesearch
       - gradient
