@@ -20,8 +20,6 @@ def train(
     batch_size,
     num_workers,
     lr,
-    momentum,
-    weight_decay,
     epochs,
     accelerator,
     compile,
@@ -56,8 +54,6 @@ def train(
         model=model,
         num_classes=2,
         lr=lr,
-        momentum=momentum,
-        weight_decay=weight_decay,
     )
 
     wandb_logger = WandbLogger(project="semantic_segmentation")
@@ -87,8 +83,6 @@ def train(
 @click.option("--batch_size", type=int, default=1, help="Batch size")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
 @click.option("--lr", type=float, default=0.01, help="Learning rate")
-@click.option("--momentum", type=float, default=0.99, help="Momentum")
-@click.option("--weight_decay", type=float, default=0.0005, help="Weight decay")
 @click.option("--epochs", type=int, default=20, help="Number of epochs")
 @click.option(
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
@@ -101,8 +95,6 @@ def train_cli(
     batch_size,
     num_workers,
     lr,
-    momentum,
-    weight_decay,
     epochs,
     accelerator,
     compile,
