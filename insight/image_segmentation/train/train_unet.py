@@ -52,7 +52,7 @@ def train(
 
     unet_module = UNetModule(
         model=model,
-        num_classes=2,
+        num_classes=NUM_CLASSES,
         lr=lr,
     )
 
