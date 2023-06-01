@@ -124,8 +124,6 @@ def load_VOCSegmentationDataset(data_dir, img_shape=(128, 128)):
     dataset = datasets.VOCSegmentation(
         root=data_dir,
         image_set="trainval",
-        transform=img_transforms,
-        target_transform=mask_transforms,
         download=True,
     )
 
