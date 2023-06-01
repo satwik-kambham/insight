@@ -113,8 +113,8 @@ def load_VOCSegmentationDataset(data_dir, simple=False, img_shape=(128, 128)):
         mask = np.array(mask)
         mask[mask == 255] = 21
         if simple:
-            mask[mask != 21 and mask != 0] = 1
             mask[mask == 21] = 0
+            mask[mask != 0] = 1
         tensor_mask = torch.from_numpy(mask).long()
         return tensor_mask
 
