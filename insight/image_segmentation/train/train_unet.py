@@ -43,6 +43,11 @@ def train(
     )
 
     wandb_logger = WandbLogger(project="semantic_segmentation")
+    wandb_logger.log_hyperparams(
+        {
+            "dataset": dataset,
+        }
+    )
     tensorboard_logger = TensorBoardLogger("tensorboard_logs/")
 
     lr_monitor = LearningRateMonitor(log_momentum=True)
