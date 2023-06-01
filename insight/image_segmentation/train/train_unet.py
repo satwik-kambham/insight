@@ -34,6 +34,8 @@ def train(
         NUM_CLASSES = 3
     elif dataset == "VOCSegmentation":
         NUM_CLASSES = 22
+    elif dataset == "VOCSegmentationSimple":
+        NUM_CLASSES = 2
 
     unet_module = UNetModule(
         num_classes=NUM_CLASSES,
@@ -69,7 +71,7 @@ def train(
     "--dataset",
     type=str,
     default="OxfordIIITPet",
-    help="Dataset name: OxfordIIITPet, VOCSegmentation",
+    help="Dataset name: OxfordIIITPet, VOCSegmentation, VOCSegmentationSimple",
 )
 @click.option("--inp_size", type=int, default=128, help="Input size")
 @click.option("--batch_size", type=int, default=1, help="Batch size")
