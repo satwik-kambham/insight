@@ -1,4 +1,7 @@
 setuptools
+torch
+torchvision
+torchaudio
 lightning
 torchmetrics
 torchinfo
@@ -11,7 +14,10 @@ pandas
 matplotlib
 bokeh
 seaborn
-wandb
+jupyter
+jupyterlab
+ipython
+ipywidgets
 datasets
 transformers
 tensorboard
@@ -19,6 +25,12 @@ gradio
 streamlit
 onnx
 onnxruntime
+opencv-python
+imgaug
+albumentations
 selectivesearch
 gradient
+black[jupyter]
+flake8
+torch-tb-profiler
 click

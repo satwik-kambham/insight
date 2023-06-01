@@ -30,7 +30,6 @@ dependencies:
   - jupyterlab
   - ipython
   - ipywidgets
-  - wandb
   - datasets
   - transformers
   - tensorboard
