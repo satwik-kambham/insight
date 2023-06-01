@@ -101,7 +101,7 @@ def load_OxfordIIITPetDataset(data_dir, img_shape=(128, 128)):
     return train_dataset, val_dataset, num_classes
 
 
-def load_VOCSegmentationDataset(data_dir, img_shape=(128, 128)):
+def load_VOCSegmentationDataset(data_dir, simple=False, img_shape=(128, 128)):
     img_transforms = transforms.Compose(
         [
             transforms.ToTensor(),
@@ -112,6 +112,9 @@ def load_VOCSegmentationDataset(data_dir, img_shape=(128, 128)):
     def mask_to_tensor(mask):
         mask = np.array(mask)
         mask[mask == 255] = 21
+        if simple:
+            mask[mask != 21 and mask != 0] = 1
+            mask[mask == 21] = 0
         tensor_mask = torch.from_numpy(mask).long()
         return tensor_mask
 
@@ -137,5 +140,7 @@ def load_VOCSegmentationDataset(data_dir, img_shape=(128, 128)):
     )
 
     num_classes = 22
+    if simple:
+        num_classes = 2
 
     return train_dataset, val_dataset, num_classes
