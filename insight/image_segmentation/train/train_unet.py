@@ -57,6 +57,7 @@ def train(
         max_epochs=epochs,
         logger=[wandb_logger, tensorboard_logger],
         callbacks=[lr_monitor],
+        log_every_n_steps=10,
     )
 
     trainer.fit(unet_module, datamodule=datamodule)
