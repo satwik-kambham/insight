@@ -12,8 +12,8 @@ def dice_loss(predicted, target, num_classes, smooth=1e-5):
     )
 
     # Flatten predicted and target tensors
-    predicted = predicted.view(-1, num_classes)
-    target_one_hot = target_one_hot.view(-1, num_classes)
+    predicted = predicted.reshape(-1, num_classes)
+    target_one_hot = target_one_hot.reshape(-1, num_classes)
 
     # Calculate intersection and union
     intersection = torch.sum(predicted * target_one_hot)

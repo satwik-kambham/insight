@@ -103,16 +103,16 @@ class UNetModule(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         data, target = batch
         output = self(data)
-        # loss = self.criterion(output, target)
-        loss = dice_loss(output, target, self.num_classes)
+        loss = self.criterion(output, target)
+        loss += dice_loss(output, target, self.num_classes)
         self.log("loss", loss)
         return loss
 
     def validation_step(self, batch, batch_idx):
         data, target = batch
         output = self(data)
-        # loss = self.criterion(output, target)
-        loss = dice_loss(output, target, self.num_classes)
+        loss = self.criterion(output, target)
+        loss += dice_loss(output, target, self.num_classes)
         self.log("val_loss", loss)
 
         self.val_pred = output
