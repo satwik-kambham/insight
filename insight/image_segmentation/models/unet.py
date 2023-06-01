@@ -77,16 +77,16 @@ class UNetModule(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        model = UNet(num_classes)
+        self.model = UNet(num_classes)
 
         test_input_shape = (1, 3, inp_size, inp_size)
         test_input = torch.randn(test_input_shape)
-        _ = model(test_input)
+        _ = self.model(test_input)
 
-        summary(model, input_size=test_input_shape)
+        summary(self.model, input_size=test_input_shape)
 
         if compile:
-            model = model.compile()
+            self.model = self.model.compile()
 
         self.lr = lr
         self.num_classes = num_classes
