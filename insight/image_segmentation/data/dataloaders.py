@@ -46,9 +46,13 @@ class AugmentedDataset:
 def get_augmentation(img_shape):
     train_transform = A.Compose(
         [
-            A.Resize(*img_shape),
+            A.RandomResizedCrop(*img_shape),
             A.HorizontalFlip(),
-            A.RandomBrightnessContrast(),
+            A.RGBShift(),
+            A.Blur(),
+            A.RandomBrightness(),
+            A.CLAHE(),
+            A.Resize(*img_shape),
         ]
     )
 
