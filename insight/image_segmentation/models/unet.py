@@ -72,6 +72,7 @@ class UNetModule(pl.LightningModule):
         inp_size,
         num_classes=3,
         lr=0.01,
+        weight_decay=0.0001,
         compile=False,
     ):
         super().__init__()
@@ -90,6 +91,7 @@ class UNetModule(pl.LightningModule):
             self.model = self.model.compile()
 
         self.lr = lr
+        self.weight_decay = weight_decay
         self.num_classes = num_classes
 
         self.criterion = nn.CrossEntropyLoss()
@@ -145,5 +147,6 @@ class UNetModule(pl.LightningModule):
         optimizer = optim.Adam(
             self.parameters(),
             lr=self.lr,
+            weight_decay=self.weight_decay,
         )
         return optimizer
