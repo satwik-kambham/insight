@@ -47,6 +47,7 @@ def get_augmentation(img_shape):
     train_transform = A.Compose(
         [
             A.RandomResizedCrop(*img_shape),
+            A.Rotate(),
             A.HorizontalFlip(),
             A.RGBShift(),
             A.Blur(),
