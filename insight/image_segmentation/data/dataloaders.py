@@ -6,6 +6,8 @@ from torchvision import datasets, transforms
 
 import albumentations as A
 
+from ..utils.class_distribution import get_class_weights
+
 
 class AugmentedDataset:
     def __init__(
@@ -51,7 +53,7 @@ def get_augmentation(img_shape):
             A.HorizontalFlip(),
             A.RGBShift(),
             A.Blur(),
-            A.RandomBrightness(),
+            A.RandomBrightnessContrast(),
             A.CLAHE(),
             A.Resize(*img_shape),
         ]
@@ -102,8 +104,9 @@ def load_OxfordIIITPetDataset(data_dir, img_shape=(128, 128)):
     )
 
     num_classes = 3
+    class_weights = get_class_weights(train_dataset, val_dataset, num_classes)
 
-    return train_dataset, val_dataset, num_classes
+    return train_dataset, val_dataset, num_classes, class_weights
 
 
 def load_VOCSegmentationDataset(data_dir, simple=False, img_shape=(128, 128)):
@@ -147,5 +150,6 @@ def load_VOCSegmentationDataset(data_dir, simple=False, img_shape=(128, 128)):
     num_classes = 22
     if simple:
         num_classes = 2
+    class_weights = get_class_weights(train_dataset, val_dataset, num_classes)
 
-    return train_dataset, val_dataset, num_classes
+    return train_dataset, val_dataset, num_classes, class_weights

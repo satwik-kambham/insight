@@ -5,6 +5,7 @@ from lightning.pytorch.callbacks import LearningRateMonitor
 
 import click
 
+from ..data.dataloaders import load_OxfordIIITPetDataset, load_VOCSegmentationDataset
 from ..data.datamodule import SegmentationDataModule
 from ..models.unet import UNetModule
 
@@ -32,15 +33,22 @@ def train(
     )
 
     if dataset == "OxfordIIITPet":
-        NUM_CLASSES = 3
+        _, _, num_classes, class_weights = load_OxfordIIITPetDataset(
+            data_dir, (inp_size, inp_size)
+        )
     elif dataset == "VOCSegmentation":
-        NUM_CLASSES = 22
+        _, _, num_classes, class_weights = load_VOCSegmentationDataset(
+            data_dir, False, (inp_size, inp_size)
+        )
     elif dataset == "VOCSegmentationSimple":
-        NUM_CLASSES = 2
+        _, _, num_classes, class_weights = load_VOCSegmentationDataset(
+            data_dir, True, (inp_size, inp_size)
+        )
 
     unet_module = UNetModule(
-        num_classes=NUM_CLASSES,
+        num_classes=num_classes,
         inp_size=inp_size,
+        class_weights=class_weights,
         lr=lr,
         weight_decay=weight_decay,
         compile=compile,
