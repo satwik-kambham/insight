@@ -2,6 +2,7 @@ import lightning.pytorch as pl
 from lightning.pytorch.loggers.wandb import WandbLogger
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import LearningRateMonitor
+from lightning.pytorch.tuner import Tuner
 
 import click
 
@@ -17,7 +18,9 @@ def train(
     batch_size,
     num_workers,
     lr,
+    use_lr_finder,
     weight_decay,
+    use_class_weights,
     epochs,
     accelerator,
     compile,
@@ -44,6 +47,9 @@ def train(
         _, _, num_classes, class_weights = load_VOCSegmentationDataset(
             data_dir, True, (inp_size, inp_size)
         )
+
+    if not use_class_weights:
+        class_weights = None
 
     unet_module = UNetModule(
         num_classes=num_classes,
@@ -72,6 +78,13 @@ def train(
         log_every_n_steps=10,
     )
 
+    if use_lr_finder:
+        tuner = Tuner(trainer)
+        lr_finder = tuner.lr_find(unet_module, datamodule=datamodule)
+        print(lr_finder.results)
+        print(lr_finder.suggestion())
+        print(unet_module.lr)
+
     trainer.fit(unet_module, datamodule=datamodule)
 
 
@@ -87,7 +100,9 @@ def train(
 @click.option("--batch_size", type=int, default=1, help="Batch size")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
 @click.option("--lr", type=float, default=0.01, help="Learning rate")
+@click.option("--use_lr_finder", type=bool, default=False, help="Use lr finder")
 @click.option("--weight_decay", type=float, default=0.0001, help="Weight decay")
+@click.option("--use_class_weights", type=bool, default=False, help="Use class weights")
 @click.option("--epochs", type=int, default=20, help="Number of epochs")
 @click.option(
     "--accelerator", type=str, default="auto", help="Accelerator: auto, cpu, gpu, tpu"
@@ -100,7 +115,9 @@ def train_cli(
     batch_size,
     num_workers,
     lr,
+    use_lr_finder,
     weight_decay,
+    use_class_weights,
     epochs,
     accelerator,
     compile,
@@ -112,7 +129,9 @@ def train_cli(
         batch_size,
         num_workers,
         lr,
+        use_lr_finder,
         weight_decay,
+        use_class_weights,
         epochs,
         accelerator,
         compile,
