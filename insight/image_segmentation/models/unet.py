@@ -145,7 +145,7 @@ class UNetModule(pl.LightningModule):
                 logger.log_image(key="val_target", images=[target_mask])
 
     def configure_optimizers(self):
-        optimizer = optim.SGD(
+        optimizer = optim.Adam(
             self.parameters(),
             lr=self.lr,
             weight_decay=self.weight_decay,
