@@ -15,6 +15,7 @@ def train(
     data_dir,
     dataset,
     inp_size,
+    pretrained,
     batch_size,
     num_workers,
     lr,
@@ -53,6 +54,7 @@ def train(
 
     unet_module = UNetModule(
         num_classes=num_classes,
+        pretrained=pretrained,
         inp_size=inp_size,
         class_weights=class_weights,
         lr=lr,
@@ -97,6 +99,7 @@ def train(
     help="Dataset name: OxfordIIITPet, VOCSegmentation, VOCSegmentationSimple",
 )
 @click.option("--inp_size", type=int, default=128, help="Input size")
+@click.option("--pretrained", type=bool, default=False, help="Use pretrained model")
 @click.option("--batch_size", type=int, default=1, help="Batch size")
 @click.option("--num_workers", type=int, default=4, help="Number of workers")
 @click.option("--lr", type=float, default=0.01, help="Learning rate")
@@ -112,6 +115,7 @@ def train_cli(
     data_dir,
     dataset,
     inp_size,
+    pretrained,
     batch_size,
     num_workers,
     lr,
@@ -126,6 +130,7 @@ def train_cli(
         data_dir,
         dataset,
         inp_size,
+        pretrained,
         batch_size,
         num_workers,
         lr,
