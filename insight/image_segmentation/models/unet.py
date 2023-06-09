@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torchvision
 
 import lightning.pytorch as pl
 from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
@@ -30,12 +31,22 @@ class DoubleConv(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, out_channels):
+    def __init__(self, out_channels, pretrained=False):
         super(UNet, self).__init__()
-        self.down1 = DoubleConv(64)
-        self.down2 = DoubleConv(128)
-        self.down3 = DoubleConv(256)
-        self.down4 = DoubleConv(512)
+        self.pretrained = pretrained
+        if pretrained:
+            pretrained_model = torchvision.models.resnet18(
+                weights=torchvision.models.ResNet18_Weights.DEFAULT
+            )
+            self.down1 = DoubleConv(64)
+            self.down2 = pretrained_model.layer2
+            self.down3 = pretrained_model.layer3
+            self.down4 = pretrained_model.layer4
+        else:
+            self.down1 = DoubleConv(64)
+            self.down2 = DoubleConv(128)
+            self.down3 = DoubleConv(256)
+            self.down4 = DoubleConv(512)
         self.up1 = nn.LazyConvTranspose2d(512, kernel_size=2, stride=2)
         self.up2 = nn.LazyConvTranspose2d(256, kernel_size=2, stride=2)
         self.up3 = nn.LazyConvTranspose2d(128, kernel_size=2, stride=2)
@@ -45,19 +56,25 @@ class UNet(nn.Module):
 
     def forward(self, x):
         # Downsampling path
-        x1 = self.down1(x)
-        x2 = nn.functional.max_pool2d(x1, kernel_size=2, stride=2)
-        x3 = self.down2(x2)
-        x4 = nn.functional.max_pool2d(x3, kernel_size=2, stride=2)
-        x5 = self.down3(x4)
-        x6 = nn.functional.max_pool2d(x5, kernel_size=2, stride=2)
-        x7 = self.down4(x6)
+        if self.pretrained:
+            x1 = self.down1(x)
+            x2 = self.down2(x1)
+            x3 = self.down3(x2)
+            x4 = self.down4(x3)
+        else:
+            x1 = self.down1(x)
+            x = nn.functional.max_pool2d(x1, kernel_size=2, stride=2)
+            x2 = self.down2(x)
+            x = nn.functional.max_pool2d(x2, kernel_size=2, stride=2)
+            x3 = self.down3(x)
+            x = nn.functional.max_pool2d(x3, kernel_size=2, stride=2)
+            x4 = self.down4(x)
 
         # Upsampling path
-        x = self.up1(x7)
-        x = torch.cat([x, x5], dim=1)
-        x = self.up2(x)
+        x = self.up1(x4)
         x = torch.cat([x, x3], dim=1)
+        x = self.up2(x)
+        x = torch.cat([x, x2], dim=1)
         x = self.up3(x)
         x = torch.cat([x, x1], dim=1)
         x = self.up4(x)
@@ -71,6 +88,7 @@ class UNetModule(pl.LightningModule):
         self,
         inp_size,
         num_classes=3,
+        pretrained=False,
         class_weights=None,
         lr=0.01,
         weight_decay=0.0001,
@@ -80,7 +98,7 @@ class UNetModule(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        self.model = UNet(num_classes)
+        self.model = UNet(num_classes, pretrained=pretrained)
 
         test_input_shape = (1, 3, inp_size, inp_size)
         test_input = torch.randn(test_input_shape)
