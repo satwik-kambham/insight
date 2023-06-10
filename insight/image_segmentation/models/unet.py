@@ -205,7 +205,10 @@ class UNetModule(pl.LightningModule):
         self.val_pred = output
         self.val_target = target
 
-        pred = output.argmax(dim=1, keepdim=False)
+        if self.num_classes == 1:
+            pred = output
+        else:
+            pred = output.argmax(dim=1, keepdim=False)
         self.accuracy(pred, target)
         self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
 
