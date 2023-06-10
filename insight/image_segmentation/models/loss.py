@@ -4,17 +4,16 @@ import torch.nn.functional as F
 
 
 class DiceLoss(nn.Module):
-    def __init__(self, num_classes):
+    def __init__(self, eps=1e-7):
         super(DiceLoss, self).__init__()
-        self.num_classes = num_classes
+        self.eps = eps
 
-    def forward(self, inputs, targets, smooth=1):
-        # inputs: (N, C, H, W)
-        # targets: (N, H, W)
-        inputs = F.softmax(inputs, dim=1)
-        targets = torch.eye(self.num_classes)[targets].permute(0, 3, 1, 2).float()
-        intersection = torch.sum(inputs * targets, dim=(2, 3))
-        union = torch.sum(inputs, dim=(2, 3)) + torch.sum(targets, dim=(2, 3))
-        dice = (2 * intersection + smooth) / (union + smooth)
-        loss = 1 - dice
-        return loss.mean()
+    def forward(self, y_pred, y_true):
+        y_pred = torch.sigmoid(y_pred)
+
+        intersection = torch.sum(y_pred * y_true)
+        union = torch.sum(y_pred) + torch.sum(y_true)
+
+        dice = 2 * intersection / (union + self.eps)
+
+        return 1 - dice
