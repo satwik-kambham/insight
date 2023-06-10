@@ -31,6 +31,44 @@ class DoubleConv(nn.Module):
 
 
 class UNet(nn.Module):
+    def __init__(self, out_channels):
+        super(UNet, self).__init__()
+
+        self.down1 = DoubleConv(64)
+        self.down2 = DoubleConv(128)
+        self.down3 = DoubleConv(256)
+        self.down4 = DoubleConv(512)
+        self.up1 = nn.LazyConvTranspose2d(512, kernel_size=2, stride=2)
+        self.up2 = nn.LazyConvTranspose2d(256, kernel_size=2, stride=2)
+        self.up3 = nn.LazyConvTranspose2d(128, kernel_size=2, stride=2)
+        self.up4 = DoubleConv(64)
+
+        self.output = nn.LazyConv2d(out_channels, kernel_size=1)
+
+    def forward(self, x):
+        # Downsampling path
+        x1 = self.down1(x)
+        x = nn.functional.max_pool2d(x1, kernel_size=2, stride=2)
+        x2 = self.down2(x)
+        x = nn.functional.max_pool2d(x2, kernel_size=2, stride=2)
+        x3 = self.down3(x)
+        x = nn.functional.max_pool2d(x3, kernel_size=2, stride=2)
+        x4 = self.down4(x)
+
+        # Upsampling path
+        x = self.up1(x4)
+        x = torch.cat([x, x3], dim=1)
+        x = self.up2(x)
+        x = torch.cat([x, x2], dim=1)
+        x = self.up3(x)
+        x = torch.cat([x, x1], dim=1)
+        x = self.up4(x)
+        x = self.output(x)
+
+        return x
+
+
+class UNetResNetBackbone(nn.Module):
     def __init__(self, out_channels, pretrained=None):
         super(UNet, self).__init__()
         self.pretrained = pretrained
@@ -63,16 +101,11 @@ class UNet(nn.Module):
                     resnet18, resnet34, resnet50, resnet101, resnet152"""
                 )
 
-        if pretrained:
-            self.down1 = DoubleConv(64)
-            self.down2 = pretrained_model.layer2
-            self.down3 = pretrained_model.layer3
-            self.down4 = pretrained_model.layer4
-        else:
-            self.down1 = DoubleConv(64)
-            self.down2 = DoubleConv(128)
-            self.down3 = DoubleConv(256)
-            self.down4 = DoubleConv(512)
+        self.down1 = DoubleConv(64)
+        self.down2 = pretrained_model.layer2
+        self.down3 = pretrained_model.layer3
+        self.down4 = pretrained_model.layer4
+
         self.up1 = nn.LazyConvTranspose2d(512, kernel_size=2, stride=2)
         self.up2 = nn.LazyConvTranspose2d(256, kernel_size=2, stride=2)
         self.up3 = nn.LazyConvTranspose2d(128, kernel_size=2, stride=2)
@@ -82,19 +115,10 @@ class UNet(nn.Module):
 
     def forward(self, x):
         # Downsampling path
-        if self.pretrained:
-            x1 = self.down1(x)
-            x2 = self.down2(x1)
-            x3 = self.down3(x2)
-            x4 = self.down4(x3)
-        else:
-            x1 = self.down1(x)
-            x = nn.functional.max_pool2d(x1, kernel_size=2, stride=2)
-            x2 = self.down2(x)
-            x = nn.functional.max_pool2d(x2, kernel_size=2, stride=2)
-            x3 = self.down3(x)
-            x = nn.functional.max_pool2d(x3, kernel_size=2, stride=2)
-            x4 = self.down4(x)
+        x1 = self.down1(x)
+        x2 = self.down2(x1)
+        x3 = self.down3(x2)
+        x4 = self.down4(x3)
 
         # Upsampling path
         x = self.up1(x4)
@@ -124,7 +148,10 @@ class UNetModule(pl.LightningModule):
 
         self.save_hyperparameters()
 
-        self.model = UNet(num_classes, pretrained=pretrained)
+        if pretrained:
+            self.model = UNetResNetBackbone(num_classes, pretrained=pretrained)
+        else:
+            self.model = UNet(num_classes)
 
         test_input_shape = (1, 3, inp_size, inp_size)
         test_input = torch.randn(test_input_shape)
