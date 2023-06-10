@@ -69,7 +69,7 @@ class UNet(nn.Module):
 
 class UNetResNetBackbone(nn.Module):
     def __init__(self, out_channels, pretrained=None):
-        super(UNet, self).__init__()
+        super(UNetResNetBackbone, self).__init__()
         self.pretrained = pretrained
 
         if pretrained:
