@@ -1,28 +1,18 @@
-import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 
-def dice_loss(predicted, target, num_classes, smooth=1e-5):
-    # Apply softmax to predicted logits
-    predicted = F.softmax(predicted, dim=1)
+class DiceLoss(nn.Module):
+    def __init__(self):
+        super(DiceLoss, self).__init__()
 
-    # Convert target to one-hot encoding
-    target_one_hot = (
-        F.one_hot(target, num_classes=num_classes).permute(0, 3, 1, 2).float()
-    )
+    def forward(self, inputs, targets, smooth=1):
+        inputs = F.sigmoid(inputs)
 
-    # Flatten predicted and target tensors
-    predicted = predicted.reshape(-1, num_classes)
-    target_one_hot = target_one_hot.reshape(-1, num_classes)
+        inputs = inputs.view(-1)
+        targets = targets.view(-1)
 
-    # Calculate intersection and union
-    intersection = torch.sum(predicted * target_one_hot)
-    union = torch.sum(predicted) + torch.sum(target_one_hot)
+        intersection = (inputs * targets).sum()
+        dice = (2.0 * intersection + smooth) / (inputs.sum() + targets.sum() + smooth)
 
-    # Calculate dice coefficient
-    dice_coefficient = (2 * intersection + smooth) / (union + smooth)
-
-    # Calculate dice loss
-    dice_loss = 1 - dice_coefficient
-
-    return dice_loss
+        return 1 - dice

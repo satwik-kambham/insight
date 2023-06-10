@@ -10,7 +10,7 @@ from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 import torchmetrics as tm
 from torchinfo import summary
 
-from .loss import dice_loss
+from .loss import DiceLoss
 from ..utils.mask import generate_mask
 
 
@@ -166,7 +166,8 @@ class UNetModule(pl.LightningModule):
         self.weight_decay = weight_decay
         self.num_classes = num_classes
 
-        self.criterion = nn.CrossEntropyLoss(weight=class_weights)
+        # self.criterion = nn.CrossEntropyLoss(weight=class_weights)
+        self.criterion = DiceLoss()
 
         self.accuracy = tm.Accuracy(task="multiclass", num_classes=num_classes)
         self.iou = tm.JaccardIndex(task="multiclass", num_classes=num_classes)
