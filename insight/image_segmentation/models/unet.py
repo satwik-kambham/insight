@@ -147,6 +147,9 @@ class UNetModule(pl.LightningModule):
 
         self.save_hyperparameters()
 
+        if num_classes == 2:
+            num_classes = 1
+
         if pretrained:
             self.model = UNetResNetBackbone(num_classes, pretrained=pretrained)
         else:
@@ -165,7 +168,7 @@ class UNetModule(pl.LightningModule):
         self.weight_decay = weight_decay
         self.num_classes = num_classes
 
-        if num_classes == 2:
+        if num_classes == 1:
             self.criterion = nn.BCEWithLogitsLoss()
         else:
             self.criterion = nn.CrossEntropyLoss(weight=class_weights)
