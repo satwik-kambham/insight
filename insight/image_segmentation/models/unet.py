@@ -179,7 +179,7 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        loss += self.dice_criterion(output, target, self.num_classes)
+        loss += self.dice_criterion(output, target)
         self.log("loss", loss)
         return loss
 
@@ -187,7 +187,7 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        loss += self.dice_criterion(output, target, self.num_classes)
+        loss += self.dice_criterion(output, target)
         self.log("val_loss", loss)
 
         self.val_pred = output
