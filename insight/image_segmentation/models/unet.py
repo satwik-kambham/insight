@@ -219,7 +219,9 @@ class UNetModule(pl.LightningModule):
 
     def on_validation_epoch_end(self):
         if self.num_classes == 1:
-            self.val_pred = torch.sigmoid(self.val_pred.unsqueeze(1))
+            print(self.val_pred.shape)
+            self.val_pred = torch.sigmoid(self.val_pred.unsqueeze(1)).long()
+            print(self.val_pred.shape)
             mask_image = generate_mask(self.val_pred, self.num_classes + 1, False)
         else:
             mask_image = generate_mask(self.val_pred, self.num_classes + 1)
