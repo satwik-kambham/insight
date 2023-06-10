@@ -207,6 +207,7 @@ class UNetModule(pl.LightningModule):
 
         if self.num_classes == 1:
             pred = output
+            target = target.long()
         else:
             pred = output.argmax(dim=1, keepdim=False)
         self.accuracy(pred, target)
