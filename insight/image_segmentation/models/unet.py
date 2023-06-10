@@ -167,7 +167,7 @@ class UNetModule(pl.LightningModule):
         self.num_classes = num_classes
 
         self.criterion = nn.CrossEntropyLoss(weight=class_weights)
-        self.dice_criterion = DiceLoss()
+        self.dice_criterion = DiceLoss(num_classes=num_classes)
 
         self.accuracy = tm.Accuracy(task="multiclass", num_classes=num_classes)
         self.iou = tm.JaccardIndex(task="multiclass", num_classes=num_classes)
