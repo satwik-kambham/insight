@@ -202,14 +202,15 @@ class UNetModule(pl.LightningModule):
         loss = self.criterion(output, target)
         self.log("val_loss", loss)
 
-        self.val_pred = output
-        self.val_target = target
-
         if self.num_classes == 1:
             pred = output
             target = target.long()
         else:
             pred = output.argmax(dim=1, keepdim=False)
+
+        self.val_pred = output
+        self.val_target = target
+
         self.accuracy(pred, target)
         self.log("val_acc", self.accuracy, on_step=False, on_epoch=True)
 
@@ -217,7 +218,11 @@ class UNetModule(pl.LightningModule):
         self.log("val_iou", self.iou, on_step=False, on_epoch=True)
 
     def on_validation_epoch_end(self):
-        mask_image = generate_mask(self.val_pred, self.num_classes + 1)
+        if self.num_classes == 1:
+            self.val_pred = torch.sigmoid(self.val_pred.unsqueeze(1))
+            mask_image = generate_mask(self.val_pred, self.num_classes + 1, False)
+        else:
+            mask_image = generate_mask(self.val_pred, self.num_classes + 1)
         target_mask = generate_mask(self.val_target, self.num_classes + 1, False)
 
         for logger in self.loggers:
