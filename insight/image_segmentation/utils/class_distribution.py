@@ -52,6 +52,10 @@ def get_class_weights(train_dataset, val_dataset, num_classes):
     # Class weights
     total_samples = class_frequencies.sum()
     class_weights = total_samples / (num_classes * class_frequencies)
+
+    # Normalize class weights
+    class_weights /= class_weights.sum()
+
     return torch.tensor(class_weights, dtype=torch.float32)
 
 
