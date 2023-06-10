@@ -31,13 +31,39 @@ class DoubleConv(nn.Module):
 
 
 class UNet(nn.Module):
-    def __init__(self, out_channels, pretrained=False):
+    def __init__(self, out_channels, pretrained=None):
         super(UNet, self).__init__()
         self.pretrained = pretrained
+
         if pretrained:
-            pretrained_model = torchvision.models.resnet18(
-                weights=torchvision.models.ResNet18_Weights.DEFAULT
-            )
+            if pretrained == "resnet18":
+                pretrained_model = torchvision.models.resnet18(
+                    weights=torchvision.models.ResNet18_Weights.DEFAULT
+                )
+            elif pretrained == "resnet34":
+                pretrained_model = torchvision.models.resnet34(
+                    weights=torchvision.models.ResNet34_Weights.DEFAULT
+                )
+            elif pretrained == "resnet50":
+                pretrained_model = torchvision.models.resnet50(
+                    weights=torchvision.models.ResNet50_Weights.DEFAULT
+                )
+            elif pretrained == "resnet101":
+                pretrained_model = torchvision.models.resnet101(
+                    weights=torchvision.models.ResNet101_Weights.DEFAULT
+                )
+            elif pretrained == "resnet152":
+                pretrained_model = torchvision.models.resnet152(
+                    weights=torchvision.models.ResNet152_Weights.DEFAULT
+                )
+            else:
+                raise ValueError(
+                    """Invalid pretrained model.
+                    Must be one of:
+                    resnet18, resnet34, resnet50, resnet101, resnet152"""
+                )
+
+        if pretrained:
             self.down1 = DoubleConv(64)
             self.down2 = pretrained_model.layer2
             self.down3 = pretrained_model.layer3
@@ -88,7 +114,7 @@ class UNetModule(pl.LightningModule):
         self,
         inp_size,
         num_classes=3,
-        pretrained=False,
+        pretrained=None,
         class_weights=None,
         lr=0.01,
         weight_decay=0.0001,
