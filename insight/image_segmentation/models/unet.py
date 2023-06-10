@@ -167,7 +167,7 @@ class UNetModule(pl.LightningModule):
         self.num_classes = num_classes
 
         self.criterion = nn.CrossEntropyLoss(weight=class_weights)
-        # self.criterion = DiceLoss()
+        self.dice_criterion = DiceLoss()
 
         self.accuracy = tm.Accuracy(task="multiclass", num_classes=num_classes)
         self.iou = tm.JaccardIndex(task="multiclass", num_classes=num_classes)
@@ -179,7 +179,7 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        # loss += dice_loss(output, target, self.num_classes)
+        loss += self.dice_criterion(output, target, self.num_classes)
         self.log("loss", loss)
         return loss
 
@@ -187,7 +187,7 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        # loss += dice_loss(output, target, self.num_classes)
+        loss += self.dice_criterion(output, target, self.num_classes)
         self.log("val_loss", loss)
 
         self.val_pred = output
@@ -222,4 +222,13 @@ class UNetModule(pl.LightningModule):
             lr=self.lr,
             weight_decay=self.weight_decay,
         )
-        return optimizer
+        lr_scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            patience=5,
+            verbose=True,
+        )
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": lr_scheduler,
+            "monitor": "val_loss",
+        }
