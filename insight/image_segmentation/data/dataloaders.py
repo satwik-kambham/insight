@@ -152,7 +152,4 @@ def load_VOCSegmentationDataset(data_dir, simple=False, img_shape=(128, 128)):
         num_classes = 2
     class_weights = get_class_weights(train_dataset, val_dataset, num_classes)
 
-    if num_classes == 22:
-        class_weights[0] = 0.1
-
     return train_dataset, val_dataset, num_classes, class_weights

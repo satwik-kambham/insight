@@ -10,7 +10,6 @@ from lightning.pytorch.loggers import TensorBoardLogger, WandbLogger
 import torchmetrics as tm
 from torchinfo import summary
 
-from .loss import DiceLoss
 from ..utils.mask import generate_mask
 
 
@@ -166,11 +165,14 @@ class UNetModule(pl.LightningModule):
         self.weight_decay = weight_decay
         self.num_classes = num_classes
 
-        self.criterion = nn.CrossEntropyLoss(weight=class_weights)
-        self.dice_criterion = DiceLoss()
+        if num_classes == 2:
+            self.criterion = nn.BCEWithLogitsLoss()
+        else:
+            self.criterion = nn.CrossEntropyLoss(weight=class_weights)
 
         self.accuracy = tm.Accuracy(task="multiclass", num_classes=num_classes)
         self.iou = tm.JaccardIndex(task="multiclass", num_classes=num_classes)
+        self.dice = tm.Dice(num_classes=num_classes, multiclass=True)
 
     def forward(self, x):
         return self.model(x)
@@ -179,7 +181,6 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        loss += self.dice_criterion(output, target)
         self.log("loss", loss)
         return loss
 
@@ -187,7 +188,6 @@ class UNetModule(pl.LightningModule):
         data, target = batch
         output = self(data)
         loss = self.criterion(output, target)
-        loss += self.dice_criterion(output, target)
         self.log("val_loss", loss)
 
         self.val_pred = output
@@ -199,6 +199,9 @@ class UNetModule(pl.LightningModule):
 
         self.iou(pred, target)
         self.log("val_iou", self.iou, on_step=False, on_epoch=True)
+
+        self.dice(pred, target)
+        self.log("val_dice", self.dice, on_step=False, on_epoch=True)
 
     def on_validation_epoch_end(self):
         mask_image = generate_mask(self.val_pred, self.num_classes + 1)
